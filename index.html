@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CH Digital Services</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CH Digital Services Chatbot</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
     body {
@@ -11,62 +12,65 @@
       font-family: 'Inter', sans-serif;
       background: linear-gradient(145deg, #0f0f0f, #1a1a1a);
       color: #fff;
-      overflow-x: hidden;
     }
-
-    /* Intro Loading */
     #intro {
+      position: fixed;
+      width: 100%;
+      height: 100vh;
+      background: rgba(0,0,0,0.95);
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
-      background: #000;
-      font-size: 1.5rem;
-      font-weight: 600;
-      animation: fadeOut 2s ease 2s forwards;
+      flex-direction: column;
+      z-index: 9999;
+      animation: fadeOut 1.5s ease 2.5s forwards;
     }
-
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #0ff;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 1rem;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
     @keyframes fadeOut {
       to { opacity: 0; visibility: hidden; }
     }
-
     .container {
-      padding: 2rem;
       max-width: 600px;
       margin: auto;
-      background: rgba(30, 30, 30, 0.85);
+      padding: 2rem;
+      background: rgba(30, 30, 30, 0.9);
       border-radius: 1rem;
-      box-shadow: 0 0 20px #0ff;
+      margin-top: 2rem;
     }
-
-    h1 {
-      font-size: 1.5rem;
-      margin-bottom: 1rem;
-    }
-
-    .button-group button {
+    .button-group button, button {
       background-color: #0f0f0f;
-      border: 1px solid #0ff;
-      padding: 0.5rem 1rem;
-      margin: 0.5rem 0.25rem;
       color: #0ff;
+      border: 1px solid #0ff;
       border-radius: 0.5rem;
+      padding: 0.5rem 1rem;
+      margin: 0.25rem;
       cursor: pointer;
-      transition: 0.3s;
+      transition: background 0.3s;
     }
-
     .button-group button:hover {
       background-color: #0ff;
       color: #000;
     }
-
-    .response {
-      margin-top: 1rem;
-      background: #222;
-      padding: 1rem;
+    input, textarea {
+      width: 100%;
+      margin: 0.5rem 0;
+      padding: 0.75rem;
       border-radius: 0.5rem;
+      border: none;
+      background: #333;
+      color: #fff;
     }
-
     .floating-btn {
       position: fixed;
       bottom: 1rem;
@@ -82,103 +86,112 @@
       box-shadow: 0 0 10px #0ff;
       z-index: 1000;
     }
-
-    input, textarea {
-      width: 100%;
-      margin: 0.5rem 0;
-      padding: 0.75rem;
-      border-radius: 0.5rem;
-      border: none;
-      background: #333;
-      color: #fff;
+    #voiceAvatar {
+      position: fixed;
+      bottom: 1rem;
+      left: 1rem;
+      width: 60px;
+      height: 60px;
+      background: radial-gradient(circle, #0ff 20%, #000 80%);
+      border-radius: 50%;
+      box-shadow: 0 0 15px #0ff;
+      animation: pulse 2s infinite;
+      display: none;
     }
-
-    .mic-hint {
-      font-size: 0.85rem;
-      color: #aaa;
-      margin-top: -0.5rem;
-    }
-
-    #voiceBtn {
-      margin-top: 0.5rem;
-      background: #0ff;
-      color: #000;
-      border-radius: 0.5rem;
-      padding: 0.5rem 1rem;
-      border: none;
-      cursor: pointer;
+    @keyframes pulse {
+      0% { box-shadow: 0 0 10px #0ff; }
+      50% { box-shadow: 0 0 20px #0ff; }
+      100% { box-shadow: 0 0 10px #0ff; }
     }
   </style>
 </head>
 <body>
-  <div id="intro">🚀 Loading CH Digital Services...</div>
-  <div class="container" style="display:none;" id="mainContent">
-    <h1>👋 Hi! Welcome to CH Digital Services.<br>How can I assist you today?</h1>
+  <div id="intro">
+    <div class="spinner"></div>
+    <p style="color:#0ff; font-size:1.2rem;">Launching CH Digital Services…</p>
+  </div>
+
+  <div class="container" id="mainContent" style="display:none;">
+    <h2>Welcome to CH Digital Services</h2>
     <div class="button-group">
-      <button onclick="setIssue('Facebook Recovery')">Facebook Recovery</button>
-      <button onclick="setIssue('Account Deletion')">Account Deletion</button>
-      <button onclick="setIssue('Page Recovery')">Page Recovery</button>
+      <button onclick="setIssue('Facebook Account Recovery')">Facebook Account Recovery</button>
+      <button onclick="setIssue('Facebook Deletion Request')">Facebook Deletion</button>
+      <button onclick="setIssue('Facebook Page Recovery')">Page Recovery</button>
     </div>
-
-    <label for="issue">Type your issue:</label>
-    <input type="text" id="issue" placeholder="Describe your problem">
-    <div class="mic-hint">🎤 Voice ready (EN/VI/PH)</div>
+    <input type="text" id="issue" placeholder="Type your issue or tap mic..." />
     <button id="voiceBtn">🎙️ Speak</button>
-
-    <div class="response" id="responseBox"></div>
-
+    <div id="responseBox" style="margin-top:1rem;"></div>
     <form id="recoveryForm">
       <input type="text" placeholder="Full Name" name="fullName" required>
       <input type="email" placeholder="Your Email" name="email" required>
-      <textarea placeholder="Describe your issue" name="details"></textarea>
+      <textarea placeholder="Describe your issue" name="details" required></textarea>
       <input type="file" name="file">
-      <button type="submit">Submit Recovery Request</button>
+      <button type="submit">Submit Request</button>
     </form>
   </div>
 
   <button class="floating-btn" onclick="toggleHelp()">💬</button>
+  <div id="voiceAvatar"></div>
+
+  <!-- Messenger Chat Plugin -->
+  <div id="fb-root"></div>
+  <div id="fb-customer-chat" class="fb-customerchat"></div>
+  <script>
+    var chatbox = document.getElementById('fb-customer-chat');
+    chatbox.setAttribute("page_id", "100091799232265");
+    chatbox.setAttribute("attribution", "biz_inbox");
+    window.fbAsyncInit = function() {
+      FB.init({ xfbml: true, version: 'v19.0' });
+    };
+    (function(d, s, id){
+       var js, fjs = d.getElementsByTagName(s)[0];
+       if (d.getElementById(id)) return;
+       js = d.createElement(s); js.id = id;
+       js.src = "https://connect.facebook.net/en_US/sdk/xfbml.customerchat.js";
+       fjs.parentNode.insertBefore(js, fjs);
+     }(document, 'script', 'facebook-jssdk'));
+  </script>
 
   <script>
     window.onload = () => {
       setTimeout(() => {
         document.getElementById('intro').style.display = 'none';
         document.getElementById('mainContent').style.display = 'block';
-      }, 2200);
+      }, 2600);
     };
-
     function setIssue(text) {
+      const box = document.getElementById('responseBox');
       document.getElementById('issue').value = text;
-      document.getElementById('responseBox').innerText = `${text} detected. Please submit the form.`;
+      box.innerText = `AI: Got it. "${text}" detected. Please submit the form below.`;
     }
-
     function toggleHelp() {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      alert('Need help? Choose a service or type your issue below.');
+      alert('Need help? Select a service or type your issue.');
     }
 
-    // Voice input logic
     const voiceBtn = document.getElementById('voiceBtn');
     const issueInput = document.getElementById('issue');
+    const voiceAvatar = document.getElementById('voiceAvatar');
     const recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (recognition) {
       const recog = new recognition();
       recog.lang = 'en-US';
       recog.continuous = false;
-
       voiceBtn.onclick = () => {
         recog.start();
-        voiceBtn.innerText = '🎙️ Listening...';
+        voiceBtn.innerText = '🎧 Listening...';
+        voiceAvatar.style.display = 'block';
       };
-
       recog.onresult = (event) => {
-        issueInput.value = event.results[0][0].transcript;
+        const transcript = event.results[0][0].transcript;
+        issueInput.value = transcript;
+        setIssue(transcript);
         voiceBtn.innerText = '🎙️ Speak';
-        setIssue(issueInput.value);
+        voiceAvatar.style.display = 'none';
       };
-
       recog.onerror = () => {
+        alert('Voice recognition failed.');
         voiceBtn.innerText = '🎙️ Speak';
-        alert('Voice recognition failed. Try again.');
+        voiceAvatar.style.display = 'none';
       };
     }
   </script>
