@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CH Digital Services - Chatbot Demo</title>
+  <style>
+    body {
+      background: #f4f4f4;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .chatbox {
+      width: 350px;
+      height: 500px;
+      background: #fff;
+      border-radius: 15px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .messages {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+    }
+    .message {
+      background: #e0e0e0;
+      margin-bottom: 10px;
+      padding: 10px;
+      border-radius: 10px;
+    }
+    .bot {
+      background: #0078FF;
+      color: white;
+      align-self: flex-start;
+    }
+    .user {
+      background: #f2f2f2;
+      align-self: flex-end;
+    }
+    .options button {
+      margin-top: 10px;
+      padding: 10px;
+      width: 100%;
+      border: none;
+      border-radius: 5px;
+      background: #0078FF;
+      color: white;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="chatbox">
+    <div class="messages" id="chat">
+      <div class="message bot">👋 Xin chào! Welcome to CH Digital Services – Facebook Recovery Support.<br>What can we help you with today?</div>
+    </div>
+    <div class="options" id="options">
+      <button onclick="respond(1)">1️⃣ Recover Disabled Facebook Account</button>
+      <button onclick="respond(2)">2️⃣ Upload Government ID</button>
+      <button onclick="respond(3)">3️⃣ Track Request Status</button>
+      <button onclick="respond(4)">4️⃣ Talk to Support</button>
+    </div>
+  </div>
+
+  <script>
+    function respond(option) {
+      const chat = document.getElementById('chat');
+      const messages = {
+        1: '🛠 Please start your recovery here: <a href="https://bit.ly/chds-appeal-form" target="_blank">chds-appeal-form</a>',
+        2: '📤 Upload your ID here: <a href="https://bit.ly/chds-id-upload" target="_blank">chds-id-upload</a>',
+        3: '📦 Enter your email or phone to check status: <a href="https://bit.ly/chds-status-form" target="_blank">chds-status-form</a>',
+        4: '💬 Please wait while we connect you to a support representative...'
+      };
+      const userMsg = document.createElement('div');
+      userMsg.className = 'message user';
+      userMsg.innerText = `You selected option ${option}`;
+      chat.appendChild(userMsg);
+
+      const botMsg = document.createElement('div');
+      botMsg.className = 'message bot';
+      botMsg.innerHTML = messages[option];
+      chat.appendChild(botMsg);
+
+      chat.scrollTop = chat.scrollHeight;
+    }
+  </script>
+</body>
+</html>
