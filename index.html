@@ -5,33 +5,48 @@
   <title>CH Digital Services - Chatbot Demo</title>
   <style>
     body {
-      background: #f4f4f4;
-      font-family: Arial, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f9f9f9;
     }
     .chatbox {
-      width: 350px;
-      height: 500px;
-      background: #fff;
+      width: 360px;
+      height: 560px;
+      background: #ffffff;
       border-radius: 15px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
       display: flex;
       flex-direction: column;
       overflow: hidden;
+      border: 3px solid #0078FF;
+    }
+    .chat-header {
+      background: #0078FF;
+      color: white;
+      text-align: center;
+      padding: 15px;
+      font-size: 16px;
+      font-weight: bold;
+      position: relative;
+    }
+    .chat-header img {
+      height: 32px;
+      position: absolute;
+      left: 15px;
+      top: 10px;
     }
     .messages {
       flex: 1;
       padding: 20px;
       overflow-y: auto;
+      background-color: #f1f7ff;
     }
     .message {
       background: #e0e0e0;
       margin-bottom: 10px;
       padding: 10px;
       border-radius: 10px;
+      max-width: 85%;
     }
     .bot {
       background: #0078FF;
@@ -39,35 +54,121 @@
       align-self: flex-start;
     }
     .user {
-      background: #f2f2f2;
+      background: #d4edff;
       align-self: flex-end;
     }
     .options button {
-      margin-top: 10px;
-      padding: 10px;
-      width: 100%;
+      margin: 5px 10px;
+      padding: 12px;
+      width: calc(100% - 20px);
       border: none;
-      border-radius: 5px;
+      border-radius: 8px;
       background: #0078FF;
       color: white;
       cursor: pointer;
+      font-size: 14px;
+      transition: background 0.3s;
+    }
+    .options button:hover {
+      background: #005fcc;
+    }
+    #chat-launcher {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #0078FF;
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 30px;
+      font-size: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      cursor: pointer;
+      z-index: 9999;
+    }
+    #chat-modal {
+      display: none;
+      position: fixed;
+      bottom: 80px;
+      right: 20px;
+      z-index: 9998;
+    }
+    #email-input {
+      margin: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    #email-input input {
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      width: 90%;
+      margin-bottom: 10px;
     }
   </style>
 </head>
 <body>
-  <div class="chatbox">
-    <div class="messages" id="chat">
-      <div class="message bot">👋 Xin chào! Welcome to CH Digital Services – Facebook Recovery Support.<br>What can we help you with today?</div>
-    </div>
-    <div class="options" id="options">
-      <button onclick="respond(1)">1️⃣ Recover Disabled Facebook Account</button>
-      <button onclick="respond(2)">2️⃣ Upload Government ID</button>
-      <button onclick="respond(3)">3️⃣ Track Request Status</button>
-      <button onclick="respond(4)">4️⃣ Talk to Support</button>
+
+  <button id="chat-launcher" onclick="toggleChat()">💬 Chat with CHDS</button>
+
+  <div id="chat-modal">
+    <div class="chatbox">
+      <div class="chat-header">
+        <img src="logo.png" alt="CHDS Logo">
+        CH Digital Services
+      </div>
+      <div class="messages" id="chat">
+        <div class="message bot">👋 Xin chào! Welcome to CH Digital Services – Facebook Recovery Support.<br>📧 Please enter your email or phone to begin:</div>
+      </div>
+      <div id="email-input">
+        <input type="text" id="userContact" placeholder="Enter email or phone" />
+        <button onclick="submitEmail()">Submit</button>
+      </div>
+      <div class="options" id="options" style="display:none">
+        <button onclick="respond(1)">1️⃣ Recover Disabled Facebook Account</button>
+        <button onclick="respond(2)">2️⃣ Upload Government ID</button>
+        <button onclick="respond(3)">3️⃣ Track Request Status</button>
+        <button onclick="respond(4)">4️⃣ Talk to Support</button>
+      </div>
     </div>
   </div>
 
+  <audio id="ping" src="https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-reward-952.mp3"></audio>
+
   <script>
+    let chatVisible = false;
+    let contactInfo = "";
+
+    function toggleChat() {
+      chatVisible = !chatVisible;
+      document.getElementById("chat-modal").style.display = chatVisible ? "block" : "none";
+      document.getElementById("chat-launcher").innerText = chatVisible ? "❌ Close Chat" : "💬 Chat with CHDS";
+    }
+
+    function submitEmail() {
+      const input = document.getElementById('userContact');
+      const chat = document.getElementById('chat');
+      const email = input.value.trim();
+      if (email.length === 0) return;
+      contactInfo = email;
+
+      const userMsg = document.createElement('div');
+      userMsg.className = 'message user';
+      userMsg.innerText = email;
+      chat.appendChild(userMsg);
+
+      const botMsg = document.createElement('div');
+      botMsg.className = 'message bot';
+      botMsg.innerText = `✅ Thanks! We'll keep your contact: ${email}\nHow can we help you today?`;
+      chat.appendChild(botMsg);
+
+      document.getElementById('email-input').style.display = 'none';
+      document.getElementById('options').style.display = 'block';
+      playPing();
+      chat.scrollTop = chat.scrollHeight;
+    }
+
     function respond(option) {
       const chat = document.getElementById('chat');
       const messages = {
@@ -86,7 +187,12 @@
       botMsg.innerHTML = messages[option];
       chat.appendChild(botMsg);
 
+      playPing();
       chat.scrollTop = chat.scrollHeight;
+    }
+
+    function playPing() {
+      document.getElementById('ping').play();
     }
   </script>
 </body>
