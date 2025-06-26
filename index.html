@@ -4,120 +4,209 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CH Digital Services Chatbot</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <style>
-    * {
-      box-sizing: border-box;
-      font-family: 'Roboto', sans-serif;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Roboto', sans-serif; }
     body {
-      margin: 0;
-      background-color: #0d0d0d;
+      background: radial-gradient(circle, #0d0d0d, #000000);
       color: #fff;
+      overflow: hidden;
     }
-    .chat-header {
-      display: flex;
-      align-items: center;
-      padding: 15px;
-      background: #0055ff;
-      color: white;
-      font-size: 1.2em;
-      font-weight: bold;
-      gap: 10px;
+    canvas#bg {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -1;
     }
-    .chat-header img {
-      height: 40px;
-      border-radius: 8px;
-    }
-    .chat-container {
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 20px;
-      background: #1a1a1a;
-      border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
-      animation: fadeIn 1s ease-in;
-    }
-    .chat-message {
-      margin-bottom: 15px;
-      padding: 10px;
-      border-radius: 5px;
-    }
-    .user-message {
-      background-color: #006400;
-      color: white;
-      text-align: right;
-    }
-    .bot-message {
-      background-color: #333;
-      color: #fff;
-    }
-    .chat-buttons button {
-      background: #008000;
-      color: white;
-      border: none;
-      padding: 12px 20px;
-      margin: 8px 0;
-      border-radius: 5px;
-      cursor: pointer;
-      width: 100%;
-      font-size: 1em;
-      transition: all 0.3s ease;
-    }
-    .chat-buttons button:hover {
-      background: #00ffcc;
-      color: #000;
-      box-shadow: 0 0 10px #00ffcc;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .loading-screen {
+    .loader {
       position: fixed;
       inset: 0;
-      background-color: #000;
+      background: #000;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
+      justify-content: center;
       z-index: 9999;
     }
-    .loading-logo {
-      width: 150px;
+    .loader img {
+      width: 120px;
       animation: pulse 2s infinite ease-in-out;
     }
+    .loader span {
+      margin-top: 20px;
+      font-size: 1.1em;
+      color: #1f51ff;
+    }
     @keyframes pulse {
-      0% { transform: scale(1); opacity: 1; }
+      0%, 100% { transform: scale(1); opacity: 1; }
       50% { transform: scale(1.05); opacity: 0.7; }
-      100% { transform: scale(1); opacity: 1; }
+    }
+    .chatbox {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      max-width: 600px;
+      margin: 60px auto;
+      background-color: #121212dd;
+      border-radius: 12px;
+      box-shadow: 0 0 20px #1f51ffcc;
+      overflow: hidden;
+    }
+    .chat-header {
+      background-color: #1f51ff;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      font-size: 1.2em;
+      font-weight: bold;
+      color: white;
+    }
+    .chat-header img {
+      width: 40px;
+      height: 40px;
+      margin-right: 10px;
+      border-radius: 8px;
+    }
+    .messages {
+      padding: 20px;
+      height: 400px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      scroll-behavior: smooth;
+    }
+    .message {
+      max-width: 80%;
+      padding: 12px;
+      border-radius: 10px;
+      animation: fadeIn 0.4s ease forwards;
+    }
+    .bot { background: #333; align-self: flex-start; }
+    .user { background: #1f51ff; align-self: flex-end; }
+    .typing { font-style: italic; color: #ccc; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .input-box {
+      display: flex;
+      border-top: 1px solid #333;
+      background-color: #1c1c1c;
+    }
+    .input-box input {
+      flex: 1;
+      padding: 14px;
+      background: #1c1c1c;
+      color: #fff;
+      border: none;
+    }
+    .input-box button {
+      padding: 14px 18px;
+      background-color: #1f51ff;
+      color: #fff;
+      border: none;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <div class="loading-screen" id="loading">
-    <img src="https://i.ibb.co/k2xHwFFz/Chat-GPT-Image-Jun-23-2025-01-33-11-PM.png" class="loading-logo" alt="Loading...">
-  </div>
+<canvas id="bg"></canvas>
+<div class="loader" id="loader">
+  <img src="https://i.ibb.co/k2xHwFFz/Chat-GPT-Image-Jun-23-2025-01-33-11-PM.png" alt="Loading..." />
+  <span>Loading CH Digital Services...</span>
+</div>
+<div class="chatbox" style="display:none;">
   <div class="chat-header">
-    <img src="https://i.ibb.co/k2xHwFFz/Chat-GPT-Image-Jun-23-2025-01-33-11-PM.png" alt="CHDS Logo">
-    CH Digital Services
+    <img src="https://i.ibb.co/k2xHwFFz/Chat-GPT-Image-Jun-23-2025-01-33-11-PM.png" alt="Logo" /> CH Digital Services
   </div>
-  <div class="chat-container">
-    <div class="chat-message bot-message">✅ Thanks! We'll keep your contact: Hi<br>How can we help you today?</div>
-    <div class="chat-message user-message">Hi</div>
-    <div class="chat-message bot-message">Please select an option below:</div>
-    <div class="chat-buttons">
-      <button onclick="location.href='https://chds-appeal-form.example.com'">1️⃣ Facebook & Instagram Recovery</button>
-      <button onclick="location.href='https://upload-id.example.com'">2️⃣ Upload Government ID</button>
-      <button onclick="location.href='https://track-status.example.com'">3️⃣ Track Request Status</button>
-      <button onclick="location.href='https://support.example.com'">4️⃣ Talk to Support</button>
-    </div>
-    <div class="chat-message user-message">You selected option 1</div>
+  <div class="messages" id="messages">
+    <div class="message bot">👋 Welcome! Please enter your email or phone to begin:</div>
   </div>
-  <script>
-    window.addEventListener('load', () => {
-      const loader = document.getElementById('loading');
-      loader.style.display = 'none';
-    });
-  </script>
+  <div class="input-box">
+    <input type="text" id="userInput" placeholder="Type your message...">
+    <button onclick="sendMessage()">Send</button>
+  </div>
+</div>
+<script>
+  window.onload = () => {
+    setTimeout(() => {
+      document.getElementById('loader').style.display = 'none';
+      document.querySelector('.chatbox').style.display = 'flex';
+    }, 2000);
+  };
+
+  const messages = document.getElementById("messages");
+  const input = document.getElementById("userInput");
+
+  function sendMessage() {
+    const text = input.value.trim();
+    if (!text) return;
+    appendMessage(text, 'user');
+    input.value = '';
+
+    // Simulate typing...
+    const typing = document.createElement('div');
+    typing.className = 'message bot typing';
+    typing.innerText = 'Typing...';
+    messages.appendChild(typing);
+    messages.scrollTop = messages.scrollHeight;
+
+    setTimeout(() => {
+      typing.remove();
+      respondToUser(text);
+    }, 1200);
+  }
+
+  function respondToUser(input) {
+    const msg = input.trim().toLowerCase();
+    let response = "❌ Invalid input. Type 1-4.";
+
+    if (msg === "1") {
+      response = "🔧 Start recovery: <a href='https://chdsform.github.io/chds-appeal-form' target='_blank'>CHDS Appeal Form</a>";
+    } else if (msg === "2") {
+      response = "📤 Upload ID here: <a href='https://chdsform.github.io/upload-id' target='_blank'>Upload Government ID</a>";
+    } else if (msg === "3") {
+      response = "📊 Track request: <a href='https://chdsform.github.io/status-check' target='_blank'>Track Request</a>";
+    } else if (msg === "4") {
+      response = "💬 Contact support: <a href='https://m.me/CharlesCHDS' target='_blank'>Messenger Chat</a>";
+    } else {
+      response = `✅ Thanks, ${input}. How can we help you today?\n\n1️⃣ Facebook & Instagram Recovery\n2️⃣ Upload Government ID\n3️⃣ Track Request Status\n4️⃣ Talk to Support`;
+    }
+
+    appendMessage(marked.parse(response), 'bot');
+  }
+
+  function appendMessage(content, sender) {
+    const msg = document.createElement('div');
+    msg.className = `message ${sender}`;
+    msg.innerHTML = content;
+    messages.appendChild(msg);
+    messages.scrollTop = messages.scrollHeight;
+  }
+
+  // Stars background
+  const canvas = document.getElementById("bg");
+  const ctx = canvas.getContext("2d");
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const stars = [];
+  for (let i = 0; i < 150; i++) {
+    stars.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, r: Math.random()*1.5 + 0.5 });
+  }
+  function drawStars() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "#1f51ff";
+    for (const s of stars) {
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    requestAnimationFrame(drawStars);
+  }
+  drawStars();
+</script>
 </body>
 </html>
