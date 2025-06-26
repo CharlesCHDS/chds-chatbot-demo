@@ -1,99 +1,158 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CH Digital Services Chatbot</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CH Digital Services</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap">
   <style>
     body {
+      font-family: 'Poppins', sans-serif;
+      background: #0e0e1a;
+      color: #fff;
       margin: 0;
-      font-family: 'Inter', sans-serif;
-      background: #0e0e1a;
-      color: white;
-    }
-    .loader {
-      position: fixed;
-      width: 100vw;
-      height: 100vh;
-      background: #0e0e1a;
+      padding: 0;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      z-index: 9999;
+      min-height: 100vh;
     }
-    .spinner {
-      border: 6px solid #1f1f2e;
-      border-top: 6px solid #00f5d4;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      animation: spin 1s linear infinite;
+    .chatbot-container {
+      max-width: 500px;
+      width: 90%;
+      background: #1a1a2e;
+      border-radius: 15px;
+      box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+      padding: 2rem;
     }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+    h1 {
+      font-size: 1.5rem;
+      text-align: center;
+      margin-bottom: 1rem;
     }
-    .chat-container {
-      padding: 20px;
+    .services button {
+      background: none;
+      border: 1px solid #00f7ff;
+      color: #00f7ff;
+      padding: 10px 15px;
+      border-radius: 10px;
+      margin: 5px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .services button:hover {
+      background: #00f7ff;
+      color: #000;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+    }
+    .submit-btn {
+      background: #00f7ff;
+      color: #000;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      padding: 10px;
+      cursor: pointer;
+      width: 100%;
+    }
+    .avatar {
+      display: flex;
+      justify-content: center;
+      margin: 10px 0;
+    }
+    .avatar img {
+      width: 80px;
+      animation: float 3s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
     }
     .voice-error {
-      color: #ff4d4d;
-      font-size: 0.9em;
-      margin-top: 10px;
+      color: #f44336;
+      font-size: 0.9rem;
     }
   </style>
 </head>
 <body>
-  <div class="loader" id="loader">
-    <div>
-      <div class="spinner"></div>
-      <p style="text-align:center; margin-top:10px;">Loading CH Digital Services...</p>
+  <div class="chatbot-container">
+    <div class="avatar">
+      <img src="https://cdn-icons-png.flaticon.com/512/4712/4712109.png" alt="AI Avatar">
     </div>
-  </div>
+    <h1>👋 Welcome to CH Digital Services</h1>
+    <div class="services">
+      <button onclick="selectService('Facebook Account Recovery')">Facebook Account Recovery</button>
+      <button onclick="selectService('Facebook Deletion')">Facebook Deletion</button>
+      <button onclick="selectService('Page Recovery')">Page Recovery</button>
+    </div>
 
-  <div class="chat-container">
-    <!-- Chat content -->
-    <h1>Welcome to CH Digital Services</h1>
-    <input type="text" id="userInput" placeholder="Speak now...">
-    <button onclick="startVoiceRecognition()">🎙️</button>
-    <div class="voice-error" id="voiceError"></div>
+    <input type="text" id="issue" placeholder="Type your issue... or use mic 🎤" oninput="handleInput()">
+    <p id="aiResponse"></p>
+
+    <form id="requestForm">
+      <input type="text" placeholder="Full Name" name="name" required />
+      <input type="email" placeholder="Your Email" name="email" required />
+      <textarea placeholder="Describe your issue" name="message" required></textarea>
+      <input type="file" name="attachment">
+      <button class="submit-btn" type="submit">Submit Request</button>
+    </form>
+    <p class="voice-error" id="micError"></p>
   </div>
 
   <script>
-    // Loader fade
-    window.addEventListener("load", () => {
-      document.getElementById("loader").style.display = "none";
-    });
-
-    const userInput = document.getElementById('userInput');
-    const voiceError = document.getElementById('voiceError');
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    const recognition = new SpeechRecognition();
-    recognition.lang = 'en-US';
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
-
-    function startVoiceRecognition() {
-      voiceError.textContent = '';
-      navigator.mediaDevices.getUserMedia({ audio: true })
-        .then(() => {
-          recognition.start();
-        })
-        .catch(() => {
-          voiceError.textContent = 'Please enable your microphone to use voice input.';
-        });
+    function selectService(service) {
+      document.getElementById("issue").value = `I need help with ${service}`;
+      handleInput();
     }
 
-    recognition.onresult = function(event) {
-      const transcript = event.results[0][0].transcript;
-      userInput.value = transcript;
-    };
+    function handleInput() {
+      const issue = document.getElementById("issue").value.toLowerCase();
+      const reply = document.getElementById("aiResponse");
 
-    recognition.onerror = function(event) {
-      console.error("Speech recognition error:", event.error);
-      voiceError.textContent = 'Voice recognition failed. Please make sure your mic is allowed and try again.';
+      if (issue.includes("delete")) {
+        reply.textContent = "🗑️ Deletion request detected. Please complete the form.";
+      } else if (issue.includes("recover") || issue.includes("recovery")) {
+        reply.textContent = "🔁 Recovery request noted. Please fill out your details.";
+      } else {
+        reply.textContent = "🤖 Got it. Please describe your issue clearly.";
+      }
+    }
+
+    const form = document.getElementById("requestForm");
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      alert("✅ Your request has been submitted! You'll receive a confirmation email.");
+      form.reset();
+      document.getElementById("aiResponse").textContent = "";
+    });
+
+    // Voice input
+    const mic = document.createElement("button");
+    mic.innerHTML = "🎤";
+    mic.style.marginTop = "10px";
+    mic.onclick = () => {
+      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = "en-US";
+      recognition.start();
+
+      recognition.onresult = (event) => {
+        document.getElementById("issue").value = event.results[0][0].transcript;
+        handleInput();
+      };
+
+      recognition.onerror = () => {
+        document.getElementById("micError").textContent = "Please enable your microphone to use voice input.";
+      }
     };
+    document.querySelector(".chatbot-container").appendChild(mic);
   </script>
 </body>
 </html>
