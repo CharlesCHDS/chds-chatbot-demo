@@ -32,7 +32,10 @@
     }
     .loader img {
       width: 120px;
-      animation: pulse 2s infinite ease-in-out;
+      height: 120px;
+      border-radius: 50%;
+      animation: pulse 2s infinite ease-in-out, rotate 8s linear infinite;
+      box-shadow: 0 0 20px #1f51ff;
     }
     .loader span {
       margin-top: 20px;
@@ -42,6 +45,10 @@
     @keyframes pulse {
       0%, 100% { transform: scale(1); opacity: 1; }
       50% { transform: scale(1.05); opacity: 0.7; }
+    }
+    @keyframes rotate {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
     .chatbox {
       display: flex;
@@ -64,10 +71,12 @@
       color: white;
     }
     .chat-header img {
-      width: 40px;
-      height: 40px;
+      width: 45px;
+      height: 45px;
       margin-right: 10px;
-      border-radius: 8px;
+      border-radius: 50%;
+      box-shadow: 0 0 10px #00f7ff;
+      animation: pulse 3s infinite;
     }
     .messages {
       padding: 20px;
@@ -123,7 +132,7 @@
     <img src="https://i.ibb.co/k2xHwFFz/Chat-GPT-Image-Jun-23-2025-01-33-11-PM.png" alt="Logo" /> CH Digital Services
   </div>
   <div class="messages" id="messages">
-    <div class="message bot">👋 Welcome! Please enter your email or phone to begin:</div>
+    <div class="message bot">👋 Welcome! Please enter your email, phone number, or question to begin:</div>
   </div>
   <div class="input-box">
     <input type="text" id="userInput" placeholder="Type your message...">
@@ -147,7 +156,6 @@
     appendMessage(text, 'user');
     input.value = '';
 
-    // Simulate typing...
     const typing = document.createElement('div');
     typing.className = 'message bot typing';
     typing.innerText = 'Typing...';
@@ -162,7 +170,7 @@
 
   function respondToUser(input) {
     const msg = input.trim().toLowerCase();
-    let response = "❌ Invalid input. Type 1-4.";
+    let response = "🤖 I'm not sure I understand yet. Please type 1-4 or ask a question like 'How long does recovery take?'";
 
     if (msg === "1") {
       response = "🔧 Start recovery: <a href='https://chdsform.github.io/chds-appeal-form' target='_blank'>CHDS Appeal Form</a>";
@@ -172,8 +180,21 @@
       response = "📊 Track request: <a href='https://chdsform.github.io/status-check' target='_blank'>Track Request</a>";
     } else if (msg === "4") {
       response = "💬 Contact support: <a href='https://m.me/CharlesCHDS' target='_blank'>Messenger Chat</a>";
-    } else {
-      response = `✅ Thanks, ${input}. How can we help you today?\n\n1️⃣ Facebook & Instagram Recovery\n2️⃣ Upload Government ID\n3️⃣ Track Request Status\n4️⃣ Talk to Support`;
+    } else if (msg.includes("how") && msg.includes("long")) {
+      response = "🕒 Recovery typically takes 24-48 hours once we’ve received all necessary documents.";
+    } else if (msg.includes("what") && msg.includes("needed")) {
+      response = "📝 To recover your account, we need:
+- A valid government-issued ID
+- The email or phone linked to your Facebook or Instagram
+- Brief explanation of the issue";
+    } else if (msg.includes("hello") || msg.includes("hi")) {
+      response = "👋 Hi there! I'm CHDS Bot. I can help with:
+1️⃣ Account Recovery
+2️⃣ Uploading ID
+3️⃣ Tracking Requests
+4️⃣ Contacting Support
+
+Type 1-4 or ask me a question!";
     }
 
     appendMessage(marked.parse(response), 'bot');
