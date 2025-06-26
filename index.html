@@ -7,198 +7,126 @@
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Roboto', sans-serif; }
-    body {
-      background: radial-gradient(circle, #0d0d0d, #000000);
-      color: #fff;
-      overflow: hidden;
-    }
-    canvas#bg {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw;
-      height: 100vh;
-      z-index: -1;
-    }
-    .loader {
-      position: fixed;
-      inset: 0;
-      background: #000;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-    }
-    .loader img {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      animation: pulse 2s infinite ease-in-out, rotate 8s linear infinite;
-      box-shadow: 0 0 20px #1f51ff;
-    }
-    .loader span {
-      margin-top: 20px;
-      font-size: 1.1em;
-      color: #1f51ff;
-    }
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.05); opacity: 0.7; }
-    }
-    @keyframes rotate {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    .chatbox {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      max-width: 600px;
-      margin: 60px auto;
-      background-color: #121212dd;
-      border-radius: 12px;
-      box-shadow: 0 0 20px #1f51ffcc;
-      overflow: hidden;
-    }
-    .chat-header {
-      background-color: #1f51ff;
-      padding: 16px;
-      display: flex;
-      align-items: center;
-      font-size: 1.2em;
-      font-weight: bold;
-      color: white;
-    }
-    .chat-header img {
-      width: 45px;
-      height: 45px;
-      margin-right: 10px;
-      border-radius: 50%;
-      box-shadow: 0 0 10px #00f7ff;
-      animation: pulse 3s infinite;
-    }
-    .messages {
-      padding: 20px;
-      height: 400px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      scroll-behavior: smooth;
-    }
-    .message {
-      max-width: 80%;
-      padding: 12px;
-      border-radius: 10px;
-      animation: fadeIn 0.4s ease forwards;
-    }
+    body { font-family: 'Roboto', sans-serif; background: #000; color: #fff; margin: 0; padding: 0; overflow-x: hidden; }
+    canvas#bg { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; }
+    .loader { position: fixed; inset: 0; background: #000; display: flex; align-items: center; justify-content: center; z-index: 9999; }
+    .loader span { color: #1f51ff; font-size: 1.2em; animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0%, 100% {opacity: 1;} 50% {opacity: 0.5;} }
+    .chatbox { max-width: 600px; margin: 60px auto; background: #121212dd; border-radius: 12px; box-shadow: 0 0 20px #1f51ffcc; overflow: hidden; display: flex; flex-direction: column; }
+    .chat-header { background: #1f51ff; padding: 1em; display: flex; justify-content: space-between; align-items: center; color: #fff; }
+    .chat-header img { border-radius: 50%; width: 40px; height: 40px; box-shadow: 0 0 10px #00f7ff; animation: pulse 3s infinite; }
+    .chat-header .status { background: limegreen; padding: 4px 10px; border-radius: 20px; font-size: 0.8em; }
+    .messages { padding: 1em; height: 400px; overflow-y: auto; display: flex; flex-direction: column; gap: 1em; }
+    .message { max-width: 80%; padding: 0.75em 1em; border-radius: 10px; animation: fadeIn 0.3s ease-in; }
     .bot { background: #333; align-self: flex-start; }
     .user { background: #1f51ff; align-self: flex-end; }
-    .typing { font-style: italic; color: #ccc; }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .input-box {
-      display: flex;
-      border-top: 1px solid #333;
-      background-color: #1c1c1c;
-    }
-    .input-box input {
-      flex: 1;
-      padding: 14px;
-      background: #1c1c1c;
-      color: #fff;
-      border: none;
-    }
-    .input-box button {
-      padding: 14px 18px;
-      background-color: #1f51ff;
-      color: #fff;
-      border: none;
-      cursor: pointer;
-    }
+    .typing { font-style: italic; opacity: 0.7; }
+    .input-box { display: flex; border-top: 1px solid #333; background: #1c1c1c; }
+    .input-box input { flex: 1; padding: 1em; background: #1c1c1c; color: white; border: none; }
+    .input-box button { background: #1f51ff; color: white; padding: 1em; border: none; cursor: pointer; }
+    .float-btn, .lang-select { position: fixed; z-index: 999; background: #1f51ff; color: white; padding: 10px 14px; border-radius: 30px; font-size: 0.9em; }
+    .float-btn { bottom: 20px; right: 20px; }
+    .lang-select { top: 20px; right: 20px; }
+    .lang-select select { background: #121212; color: white; border: none; padding: 5px; border-radius: 6px; }
+    @keyframes fadeIn { from {opacity: 0;} to {opacity: 1;} }
   </style>
 </head>
 <body>
 <canvas id="bg"></canvas>
-<div class="loader" id="loader">
-  <span>Loading CH Digital Services...</span>
+<div class="lang-select">
+  <label>🌍 Language: 
+    <select onchange="setLanguage(this.value)">
+      <option value="en">English</option>
+      <option value="tl">Filipino</option>
+      <option value="vi">Vietnamese</option>
+    </select>
+  </label>
 </div>
-<div class="chatbox" style="display:none;">
+<div class="loader" id="loader"><span>Loading CH Digital Services...</span></div>
+<div class="chatbox" style="display:none">
   <div class="chat-header">
-    <img src="https://i.ibb.co/k2xHwFFz/Chat-GPT-Image-Jun-23-2025-01-33-11-PM.png" alt="Logo" /> CH Digital Services
+    <div style="display:flex;align-items:center">
+      <img src="https://i.ibb.co/k2xHwFFz/Chat-GPT-Image-Jun-23-2025-01-33-11-PM.png" alt="Logo" />&nbsp;CH Digital Services
+    </div>
+    <span class="status">🟢 Online</span>
   </div>
   <div class="messages" id="messages">
-    <div class="message bot">👋 Welcome! Please enter your email, phone number, or question to begin:</div>
+    <div class="message bot" id="welcomeMsg">👋 Welcome! Please enter your email, phone number, or question to begin:</div>
   </div>
   <div class="input-box">
-    <input type="text" id="userInput" placeholder="Type your message...">
+    <input type="text" id="userInput" placeholder="Type your message..."/>
     <button onclick="sendMessage()">Send</button>
   </div>
 </div>
+<div class="float-btn" onclick="openFAQ()">❓ Help / FAQ</div>
 <script>
+  const memory = { name: '', contact: '', language: 'en' };
+  const LANG = {
+    en: { welcome: "👋 Welcome! Please enter your email, phone number, or question to begin:", faq: "FAQ: 1. Start Recovery 2. Upload ID 3. Track Request 4. Contact Support\nYou can also ask questions like 'How long does recovery take?'" },
+    tl: { welcome: "👋 Kamusta! Pakilagay ang iyong email, numero, o tanong para makapagsimula:", faq: "FAQ: 1. Simulan ang Pag-recover 2. Mag-upload ng ID 3. Subaybayan ang Request 4. Makipag-ugnayan\nPwede ka ring magtanong tulad ng 'Gaano katagal ang proseso?'" },
+    vi: { welcome: "👋 Xin chào! Vui lòng nhập email, số điện thoại hoặc câu hỏi để bắt đầu:", faq: "FAQ: 1. Bắt đầu khôi phục 2. Tải lên ID 3. Theo dõi yêu cầu 4. Liên hệ hỗ trợ\nBạn cũng có thể hỏi 'Khôi phục mất bao lâu?'" }
+  };
+  function setLanguage(code) {
+    memory.language = code;
+    document.getElementById("welcomeMsg").innerText = LANG[code].welcome;
+  }
+  function openFAQ() {
+    alert(LANG[memory.language].faq);
+  }
   window.onload = () => {
     setTimeout(() => {
-    document.getElementById('loader').style.display = 'none';
-    document.querySelector('.chatbox').style.display = 'flex';
-  }, 800);
+      document.getElementById('loader').style.display = 'none';
+      document.querySelector('.chatbox').style.display = 'flex';
+    }, 800);
   };
-
   const messages = document.getElementById("messages");
   const input = document.getElementById("userInput");
-
   function sendMessage() {
     const text = input.value.trim();
     if (!text) return;
     appendMessage(text, 'user');
     input.value = '';
-
     const typing = document.createElement('div');
     typing.className = 'message bot typing';
     typing.innerText = 'Typing...';
     messages.appendChild(typing);
     messages.scrollTop = messages.scrollHeight;
-
     setTimeout(() => {
       typing.remove();
       respondToUser(text);
-    }, 1200);
+    }, 1000);
   }
-
-  function respondToUser(input) {
-    const msg = input.trim().toLowerCase();
+  function respondToUser(msg) {
+    const lower = msg.toLowerCase();
     let response = "🤖 I'm not sure I understand yet. Please type 1-4 or ask a question like 'How long does recovery take?'";
-
-    if (msg === "1") {
-      response = "🔧 Start recovery: <a href='https://chdsform.github.io/chds-appeal-form' target='_blank'>CHDS Appeal Form</a>";
-    } else if (msg === "2") {
-      response = "📤 Upload ID here: <a href='https://chdsform.github.io/upload-id' target='_blank'>Upload Government ID</a>";
-    } else if (msg === "3") {
-      response = "📊 Track request: <a href='https://chdsform.github.io/status-check' target='_blank'>Track Request</a>";
-    } else if (msg === "4") {
-      response = "💬 Contact support: <a href='https://m.me/CharlesCHDS' target='_blank'>Messenger Chat</a>";
-    } else if (msg.includes("how") && msg.includes("long")) {
-      response = "🕒 Recovery typically takes 24-48 hours once we’ve received all necessary documents.";
-    } else if (msg.includes("what") && msg.includes("needed")) {
-      response = "📝 To recover your account, we need:
-- A valid government-issued ID
-- The email or phone linked to your Facebook or Instagram
-- Brief explanation of the issue";
-    } else if (msg.includes("hello") || msg.includes("hi")) {
-      response = "👋 Hi there! I'm CHDS Bot. I can help with:
-1️⃣ Account Recovery
-2️⃣ Uploading ID
-3️⃣ Tracking Requests
-4️⃣ Contacting Support
-
-Type 1-4 or ask me a question!";
+    if (lower.includes("my name is")) {
+      memory.name = lower.split("my name is")[1].trim().split(" ")[0];
+      response = `👍 Got it, ${memory.name}. How can I assist you today?`;
+    } else if (lower.includes("@") || lower.match(/\d{10,}/)) {
+      memory.contact = msg;
+      response = `📧 Thanks! I’ve saved your contact: ${memory.contact}`;
+    } else if (lower.includes("lost") || lower.includes("disabled") || lower.includes("need help")) {
+      response = `😟 I'm here for you! Would you like to:
+1️⃣ Start a recovery: <a href='https://chdsform.github.io/chds-appeal-form' target='_blank'>Start Now</a><br>2️⃣ Upload ID: <a href='https://chdsform.github.io/upload-id' target='_blank'>Upload Here</a>`;
+    } else if (lower.includes("upload")) {
+      response = `📤 You can upload your government ID here: <a href='https://chdsform.github.io/upload-id' target='_blank'>Upload Now</a>`;
+    } else if (lower.includes("how") && lower.includes("long")) {
+      response = `⏳ Most recoveries take 24–48 hours. We'll notify you once it's processed.`;
+    } else if (lower.includes("what") && lower.includes("needed")) {
+      response = `📋 Required: <br>- Government ID<br>- Linked email or phone<br>- Reason for appeal`;
+    } else if (lower === "1") {
+      response = `🔧 Start your recovery: <a href='https://chdsform.github.io/chds-appeal-form' target='_blank'>CHDS Appeal Form</a>`;
+    } else if (lower === "2") {
+      response = `📤 Upload ID here: <a href='https://chdsform.github.io/upload-id' target='_blank'>Upload Now</a>`;
+    } else if (lower === "3") {
+      response = `📊 Track your request here: <a href='https://chdsform.github.io/status-check' target='_blank'>Track Now</a>`;
+    } else if (lower === "4") {
+      response = `📨 Contact support: <a href='https://m.me/CharlesCHDS' target='_blank'>Message Now</a>`;
+    } else if (lower.includes("hi") || lower.includes("hello")) {
+      response = `👋 Hi ${memory.name || 'there'}! I'm CHDS Bot. I can help you with:<br>1️⃣ Account Recovery<br>2️⃣ Upload ID<br>3️⃣ Track Request<br>4️⃣ Contact Support`; 
     }
-
     appendMessage(marked.parse(response), 'bot');
   }
-
   function appendMessage(content, sender) {
     const msg = document.createElement('div');
     msg.className = `message ${sender}`;
@@ -206,24 +134,19 @@ Type 1-4 or ask me a question!";
     messages.appendChild(msg);
     messages.scrollTop = messages.scrollHeight;
   }
-
-  // Stars background
   const canvas = document.getElementById("bg");
   const ctx = canvas.getContext("2d");
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
-  const stars = [];
-  for (let i = 0; i < 150; i++) {
-    stars.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, r: Math.random()*1.5 + 0.5 });
-  }
+  const stars = Array.from({length: 150}, () => ({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, r: Math.random()*1.5 + 0.5 }));
   function drawStars() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = "#1f51ff";
-    for (const s of stars) {
+    stars.forEach(s => {
       ctx.beginPath();
       ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
       ctx.fill();
-    }
+    });
     requestAnimationFrame(drawStars);
   }
   drawStars();
