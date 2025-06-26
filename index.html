@@ -4,148 +4,120 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CH Digital Services Chatbot</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
   <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Roboto', sans-serif;
+    }
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: #121212;
-      color: #ffffff;
-    }
-    .chat-header {
-      background-color: #1e88e5;
-      padding: 16px;
-      display: flex;
-      align-items: center;
-      font-size: 1.2rem;
-      font-weight: bold;
-    }
-    .chat-header img {
-      width: 40px;
-      height: 40px;
-      margin-right: 10px;
-    }
-    .chatbox {
-      padding: 20px;
-      max-width: 600px;
-      margin: 0 auto;
-    }
-    .bot-message, .user-message {
-      padding: 10px;
-      border-radius: 8px;
-      margin-bottom: 10px;
-      width: fit-content;
-      max-width: 90%;
-    }
-    .bot-message {
-      background-color: #2e2e2e;
-      color: #e0e0e0;
-    }
-    .user-message {
-      background-color: #2e7d32;
-      align-self: flex-end;
-    }
-    .options button {
-      background-color: #388e3c;
-      color: white;
-      padding: 12px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      display: block;
-      margin: 10px 0;
-      width: 100%;
-    }
-    input[type="text"] {
-      padding: 12px;
-      border-radius: 6px;
-      border: 1px solid #555;
-      width: calc(100% - 100px);
-      margin-right: 10px;
-      background: #1c1c1c;
+      background-color: #0d0d0d;
       color: #fff;
     }
-    button.send-btn {
-      padding: 12px 20px;
-      border-radius: 6px;
-      background-color: #1e88e5;
+    .chat-header {
+      display: flex;
+      align-items: center;
+      padding: 15px;
+      background: #0055ff;
+      color: white;
+      font-size: 1.2em;
+      font-weight: bold;
+      gap: 10px;
+    }
+    .chat-header img {
+      height: 40px;
+      border-radius: 8px;
+    }
+    .chat-container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background: #1a1a1a;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+      animation: fadeIn 1s ease-in;
+    }
+    .chat-message {
+      margin-bottom: 15px;
+      padding: 10px;
+      border-radius: 5px;
+    }
+    .user-message {
+      background-color: #006400;
+      color: white;
+      text-align: right;
+    }
+    .bot-message {
+      background-color: #333;
+      color: #fff;
+    }
+    .chat-buttons button {
+      background: #008000;
       color: white;
       border: none;
+      padding: 12px 20px;
+      margin: 8px 0;
+      border-radius: 5px;
       cursor: pointer;
+      width: 100%;
+      font-size: 1em;
+      transition: all 0.3s ease;
+    }
+    .chat-buttons button:hover {
+      background: #00ffcc;
+      color: #000;
+      box-shadow: 0 0 10px #00ffcc;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .loading-screen {
+      position: fixed;
+      inset: 0;
+      background-color: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+    .loading-logo {
+      width: 150px;
+      animation: pulse 2s infinite ease-in-out;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.05); opacity: 0.7; }
+      100% { transform: scale(1); opacity: 1; }
     }
   </style>
 </head>
 <body>
+  <div class="loading-screen" id="loading">
+    <img src="https://i.ibb.co/k2xHwFFz/Chat-GPT-Image-Jun-23-2025-01-33-11-PM.png" class="loading-logo" alt="Loading...">
+  </div>
   <div class="chat-header">
-    <img src="https://i.ibb.co/k2xHwFFz/Chat-GPT-Image-Jun-23-2025-01-33-11-PM.png" alt="CHDS Logo" />
-    CH Digital Services Assistance
+    <img src="https://i.ibb.co/k2xHwFFz/Chat-GPT-Image-Jun-23-2025-01-33-11-PM.png" alt="CHDS Logo">
+    CH Digital Services
   </div>
-  <div class="chatbox" id="chatbox">
-    <div class="bot-message">📧 Please enter your email or phone to begin:</div>
+  <div class="chat-container">
+    <div class="chat-message bot-message">✅ Thanks! We'll keep your contact: Hi<br>How can we help you today?</div>
+    <div class="chat-message user-message">Hi</div>
+    <div class="chat-message bot-message">Please select an option below:</div>
+    <div class="chat-buttons">
+      <button onclick="location.href='https://chds-appeal-form.example.com'">1️⃣ Facebook & Instagram Recovery</button>
+      <button onclick="location.href='https://upload-id.example.com'">2️⃣ Upload Government ID</button>
+      <button onclick="location.href='https://track-status.example.com'">3️⃣ Track Request Status</button>
+      <button onclick="location.href='https://support.example.com'">4️⃣ Talk to Support</button>
+    </div>
+    <div class="chat-message user-message">You selected option 1</div>
   </div>
-  <div class="chatbox" style="display: flex;">
-    <input type="text" id="userInput" placeholder="Type your message..." />
-    <button class="send-btn" onclick="sendMessage()">Send</button>
-  </div>
-
   <script>
-    function appendMessage(content, sender = 'bot') {
-      const chatbox = document.getElementById('chatbox');
-      const msgDiv = document.createElement('div');
-      msgDiv.className = sender === 'user' ? 'user-message' : 'bot-message';
-      msgDiv.innerText = content;
-      chatbox.appendChild(msgDiv);
-      chatbox.scrollTop = chatbox.scrollHeight;
-    }
-
-    function sendMessage() {
-      const input = document.getElementById('userInput');
-      const text = input.value;
-      if (!text) return;
-      appendMessage(text, 'user');
-      const response = handleUserInput(text);
-      if (response.selected) appendMessage(response.selected);
-      appendMessage(response.message);
-      input.value = '';
-    }
-
-    function handleUserInput(input) {
-      const userInput = input.trim().toLowerCase();
-      if (userInput === "1") {
-        return {
-          message: "🔧 Please start your recovery here: https://chds.link/appeal",
-          selected: "🟩 You selected: Facebook & Instagram Recovery"
-        };
-      } else if (userInput === "2") {
-        return {
-          message: "📤 Upload your Government ID here: https://chds.link/upload-id",
-          selected: "🟩 You selected: Upload Government ID"
-        };
-      } else if (userInput === "3") {
-        return {
-          message: "🔎 Track your request here: https://chds.link/track-status",
-          selected: "🟩 You selected: Track Request Status"
-        };
-      } else if (userInput === "4") {
-        return {
-          message: "💬 Contact support here: https://chds.link/support",
-          selected: "🟩 You selected: Talk to Support"
-        };
-      } else {
-        return {
-          message: "❌ Invalid input. Please enter a number (1-4).",
-          selected: null
-        };
-      }
-    }
-
-    window.onload = () => {
-      appendMessage("✅ Thanks! We'll keep your contact: [placeholder] How can we help you today?");
-      appendMessage("Please select an option below:");
-      appendMessage("1️⃣ Facebook & Instagram Recovery");
-      appendMessage("2️⃣ Upload Government ID");
-      appendMessage("3️⃣ Track Request Status");
-      appendMessage("4️⃣ Talk to Support");
-    }
+    window.addEventListener('load', () => {
+      const loader = document.getElementById('loading');
+      loader.style.display = 'none';
+    });
   </script>
 </body>
 </html>
