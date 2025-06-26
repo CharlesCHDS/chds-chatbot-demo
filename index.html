@@ -7,181 +7,144 @@
   <style>
     body {
       margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #0d1117;
+      font-family: Arial, sans-serif;
+      background-color: #121212;
       color: #ffffff;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
     }
-    .chatbox {
-      background-color: #161b22;
-      border-radius: 12px;
-      width: 360px;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
-      overflow: hidden;
-    }
-    .header {
-      background-color: #1f6feb;
+    .chat-header {
+      background-color: #1e88e5;
       padding: 16px;
-      font-size: 18px;
-      font-weight: bold;
       display: flex;
       align-items: center;
-      color: white;
+      font-size: 1.2rem;
+      font-weight: bold;
     }
-    .header img {
-      width: 28px;
-      height: 28px;
+    .chat-header img {
+      width: 40px;
+      height: 40px;
       margin-right: 10px;
     }
-    .messages {
-      padding: 16px;
-      max-height: 400px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
+    .chatbox {
+      padding: 20px;
+      max-width: 600px;
+      margin: 0 auto;
     }
-    .bot, .user {
-      padding: 10px 14px;
-      border-radius: 10px;
-      max-width: 85%;
-    }
-    .bot {
-      background-color: #21262d;
-      align-self: flex-start;
-    }
-    .user {
-      background-color: #238636;
-      align-self: flex-end;
-    }
-    .input-area {
-      display: flex;
-      border-top: 1px solid #30363d;
-    }
-    .input-area input {
-      flex: 1;
-      padding: 10px;
-      border: none;
-      background: #0d1117;
-      color: #fff;
-    }
-    .input-area button {
-      background-color: #1f6feb;
-      color: white;
-      border: none;
-      padding: 0 16px;
-      cursor: pointer;
-    }
-    .button-grid {
-      display: grid;
-      gap: 8px;
-      margin-top: 12px;
-    }
-    .button-grid button {
-      background-color: #238636;
-      border: none;
-      color: white;
+    .bot-message, .user-message {
       padding: 10px;
       border-radius: 8px;
-      cursor: pointer;
-      transition: background 0.3s;
+      margin-bottom: 10px;
+      width: fit-content;
+      max-width: 90%;
     }
-    .button-grid button:hover {
-      background-color: #2ea043;
+    .bot-message {
+      background-color: #2e2e2e;
+      color: #e0e0e0;
+    }
+    .user-message {
+      background-color: #2e7d32;
+      align-self: flex-end;
+    }
+    .options button {
+      background-color: #388e3c;
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      display: block;
+      margin: 10px 0;
+      width: 100%;
+    }
+    input[type="text"] {
+      padding: 12px;
+      border-radius: 6px;
+      border: 1px solid #555;
+      width: calc(100% - 100px);
+      margin-right: 10px;
+      background: #1c1c1c;
+      color: #fff;
+    }
+    button.send-btn {
+      padding: 12px 20px;
+      border-radius: 6px;
+      background-color: #1e88e5;
+      color: white;
+      border: none;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <div class="chatbox">
-    <div class="header">
-      <img src="https://i.ibb.co/3WKwS2G/chds-icon.png" alt="CHDS Logo" />
-      CH Digital Services
-    </div>
-    <div class="messages" id="chat">
-      <div class="bot">📨 Please enter your email or phone to begin:</div>
-    </div>
-    <div class="input-area">
-      <input type="text" id="userInput" placeholder="Type your message...">
-      <button onclick="submitInput()">Send</button>
-    </div>
+  <div class="chat-header">
+    <img src="https://i.imgur.com/logo.png" alt="CHDS Logo" />
+    CH Digital Services
+  </div>
+  <div class="chatbox" id="chatbox">
+    <div class="bot-message">📧 Please enter your email or phone to begin:</div>
+  </div>
+  <div class="chatbox" style="display: flex;">
+    <input type="text" id="userInput" placeholder="Type your message..." />
+    <button class="send-btn" onclick="sendMessage()">Send</button>
   </div>
 
   <script>
-    let step = 0;
-    let contact = "";
-
-    function appendMessage(content, from) {
-      const chat = document.getElementById("chat");
-      const msg = document.createElement("div");
-      msg.className = from;
-      msg.innerText = content;
-      chat.appendChild(msg);
-      chat.scrollTop = chat.scrollHeight;
+    function appendMessage(content, sender = 'bot') {
+      const chatbox = document.getElementById('chatbox');
+      const msgDiv = document.createElement('div');
+      msgDiv.className = sender === 'user' ? 'user-message' : 'bot-message';
+      msgDiv.innerText = content;
+      chatbox.appendChild(msgDiv);
+      chatbox.scrollTop = chatbox.scrollHeight;
     }
 
-    function submitInput() {
-      const input = document.getElementById("userInput");
-      const value = input.value.trim();
-      if (!value) return;
+    function sendMessage() {
+      const input = document.getElementById('userInput');
+      const text = input.value;
+      if (!text) return;
+      appendMessage(text, 'user');
+      const response = handleUserInput(text);
+      if (response.selected) appendMessage(response.selected);
+      appendMessage(response.message);
+      input.value = '';
+    }
 
-      appendMessage(value, "user");
-      input.value = "";
-
-      if (step === 0) {
-        contact = value;
-        appendMessage("✅ Thanks! We'll keep your contact: " + contact + "\nHow can we help you today?", "bot");
-        setTimeout(() => {
-          appendMessage("Please select an option below:", "bot");
-          showOptions();
-        }, 1000);
-        step = 1;
+    function handleUserInput(input) {
+      const userInput = input.trim().toLowerCase();
+      if (userInput === "1") {
+        return {
+          message: "🔧 Please start your recovery here: https://chds.link/appeal",
+          selected: "🟩 You selected: Facebook & Instagram Recovery"
+        };
+      } else if (userInput === "2") {
+        return {
+          message: "📤 Upload your Government ID here: https://chds.link/upload-id",
+          selected: "🟩 You selected: Upload Government ID"
+        };
+      } else if (userInput === "3") {
+        return {
+          message: "🔎 Track your request here: https://chds.link/track-status",
+          selected: "🟩 You selected: Track Request Status"
+        };
+      } else if (userInput === "4") {
+        return {
+          message: "💬 Contact support here: https://chds.link/support",
+          selected: "🟩 You selected: Talk to Support"
+        };
+      } else {
+        return {
+          message: "❌ Invalid input. Please enter a number (1-4).",
+          selected: null
+        };
       }
     }
 
-    function showOptions() {
-      const chat = document.getElementById("chat");
-      const container = document.createElement("div");
-      container.className = "button-grid";
-
-      const buttons = [
-        "1️⃣ Recover Disabled Facebook Account",
-        "2️⃣ Upload Government ID",
-        "3️⃣ Track Request Status",
-        "4️⃣ Talk to Support"
-      ];
-
-      buttons.forEach((text, index) => {
-        const btn = document.createElement("button");
-        btn.innerText = text;
-        btn.onclick = () => handleOption(index + 1);
-        container.appendChild(btn);
-      });
-
-      chat.appendChild(container);
-    }
-
-    function handleOption(option) {
-      appendMessage("You selected option " + option, "user");
-
-      switch(option) {
-        case 1:
-          appendMessage("🛠️ Please start your recovery here: \nhttps://chds-recovery.com/appeal-form", "bot");
-          break;
-        case 2:
-          appendMessage("🆔 Upload your valid government-issued ID here:\nhttps://chds-recovery.com/upload-id", "bot");
-          break;
-        case 3:
-          appendMessage("📊 Track your request status here:\nhttps://chds-recovery.com/status", "bot");
-          break;
-        case 4:
-          appendMessage("💬 Our team will reach out to you shortly! You may also message us at support@chds.com.", "bot");
-          break;
-        default:
-          appendMessage("Invalid option.", "bot");
-      }
+    window.onload = () => {
+      appendMessage("✅ Thanks! We'll keep your contact: [placeholder] How can we help you today?");
+      appendMessage("Please select an option below:");
+      appendMessage("1️⃣ Facebook & Instagram Recovery");
+      appendMessage("2️⃣ Upload Government ID");
+      appendMessage("3️⃣ Track Request Status");
+      appendMessage("4️⃣ Talk to Support");
     }
   </script>
 </body>
