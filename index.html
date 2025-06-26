@@ -2,138 +2,192 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CH Digital Services – AI Chatbot</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CH Digital Services</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+  <script>
+    (function(){
+      emailjs.init("TuOKpz6JGnAygQ6Fp");
+    })();
+  </script>
   <style>
-    body { margin: 0; font-family: 'Segoe UI', sans-serif; background-color: #0d0d0d; color: white; }
-    .chatbox { max-width: 600px; margin: 60px auto; background: #1a1a1a; border-radius: 16px; box-shadow: 0 0 30px #1f51ff; padding: 20px; }
-    .messages { max-height: 300px; overflow-y: auto; padding: 10px; background: #121212; border-radius: 8px; margin-bottom: 10px; }
-    .message { margin: 8px 0; }
-    .bot { color: #00f7ff; }
-    .user { text-align: right; color: #1f51ff; }
-    .input-group { display: flex; gap: 10px; margin-bottom: 10px; }
-    input[type=text], input[type=email], textarea { flex: 1; padding: 10px; border: none; border-radius: 6px; background: #222; color: white; }
-    button { background: #1f51ff; border: none; padding: 10px 15px; border-radius: 6px; color: white; cursor: pointer; }
-    .upload-btn, .mic-btn { font-size: 20px; background: #444; }
-    .lang-select { margin-top: 10px; background: #111; color: white; border: 1px solid #444; padding: 5px; border-radius: 6px; }
-    form { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
-    textarea { resize: vertical; min-height: 60px; }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #0a0f1a;
+      color: white;
+    }
+    header {
+      background: linear-gradient(45deg, #000428, #004e92);
+      padding: 1em;
+      text-align: center;
+      font-size: 1.5em;
+      font-weight: bold;
+    }
+    .chatbot-container {
+      padding: 20px;
+      max-width: 600px;
+      margin: 0 auto;
+      background: #111827;
+      border-radius: 20px;
+      box-shadow: 0 0 30px rgba(0, 255, 255, 0.1);
+      animation: fadeIn 1s ease-in;
+    }
+    .chatbot-message, .chatbot-input {
+      margin: 15px 0;
+    }
+    .chatbot-button {
+      display: block;
+      background: #10b981;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 10px;
+      margin: 10px 0;
+      cursor: pointer;
+      width: 100%;
+      transition: 0.3s;
+    }
+    .chatbot-button:hover {
+      background: #059669;
+    }
+    .floating-button {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #3b82f6;
+      border: none;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      font-size: 1.5em;
+      color: white;
+      box-shadow: 0 0 20px rgba(0, 123, 255, 0.5);
+      cursor: pointer;
+      animation: pulse 2s infinite;
+    }
+    .voice-status {
+      font-size: 0.8em;
+      margin-top: 5px;
+      color: #9ca3af;
+    }
+    .suggested-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 15px 0;
+    }
+    .suggested-buttons button {
+      flex: 1 1 45%;
+      background: #1f2937;
+      border: 1px solid #4b5563;
+      color: #f3f4f6;
+      padding: 10px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .suggested-buttons button:hover {
+      background: #374151;
+    }
+    .ai-response {
+      background: #1f2937;
+      padding: 10px;
+      margin-top: 15px;
+      border-radius: 10px;
+      color: #d1d5db;
+    }
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(20px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); }
+      70% { box-shadow: 0 0 0 20px rgba(59, 130, 246, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+    }
   </style>
 </head>
 <body>
-  <div class="chatbox">
-    <h2>🤖 CH Digital Services Chatbot</h2>
-    <div class="messages" id="messages"></div>
-    <div class="input-group">
-      <input type="text" id="userInput" placeholder="Type or speak your message...">
-      <button onclick="sendMessage()">Send</button>
-      <button class="mic-btn" onclick="startListening()">🎤</button>
+  <header>
+    <img src="https://i.ibb.co/k2xHwFFz/Chat-GPT-Image-Jun-23-2025-01-33-11-PM.png" alt="CHDS Logo" style="width: 40px; border-radius: 50%; vertical-align: middle; margin-right: 10px;"> CH Digital Services
+  </header>
+
+  <div class="chatbot-container">
+    <div class="chatbot-message">👋 Hi! Welcome to CHDS. Please enter your email and describe your issue below.</div>
+
+    <div class="suggested-buttons">
+      <button onclick="showServices()">💼 Services</button>
+      <button onclick="showFeatures()">💡 Features</button>
+      <button onclick="handleRecovery()">🔁 Account Recovery</button>
+      <button onclick="handleSupport()">🎧 Talk to Support</button>
     </div>
-    <button class="upload-btn" onclick="document.getElementById('fileInput').click()">📎 Upload ID</button>
-    <input type="file" id="fileInput" accept="image/*,.pdf" style="display:none">
-    <select class="lang-select" onchange="setLang(this.value)">
-      <option value="en">🇺🇸 English</option>
-      <option value="tl">🇵🇭 Filipino</option>
-      <option value="vi">🇻🇳 Vietnamese</option>
-    </select>
 
     <form id="supportForm">
-      <h3>📩 Submit Your Account Issue</h3>
-      <input type="text" id="name" placeholder="Your Name" required>
-      <input type="email" id="email" placeholder="Your Email" required>
-      <textarea id="issue" placeholder="Describe your issue..." required></textarea>
-      <button type="submit">Submit</button>
+      <input type="email" name="user_email" placeholder="Your Email" required style="width: 100%; padding: 10px; border-radius: 5px; margin: 10px 0;" />
+      <textarea id="messageBox" name="message" placeholder="Tell us your issue..." required style="width: 100%; padding: 10px; border-radius: 5px; height: 100px;"></textarea>
+      <button type="submit" class="chatbot-button">📨 Submit</button>
     </form>
+
+    <div id="aiReply" class="ai-response" style="display:none;"></div>
+    <div class="voice-status">🎙️ Voice assistant ready</div>
   </div>
 
+  <button class="floating-button" onclick="toggleChatbot()"><i class="fas fa-comments"></i></button>
+
   <script>
-    let currentLang = 'en';
-    const messages = document.getElementById("messages");
-    const input = document.getElementById("userInput");
-    const fileInput = document.getElementById("fileInput");
-    const supportForm = document.getElementById("supportForm");
+    const form = document.getElementById('supportForm');
+    const aiReply = document.getElementById('aiReply');
+    const messageBox = document.getElementById('messageBox');
 
-    function setLang(lang) {
-      currentLang = lang;
-      appendMessage(`🌐 Language set to ${lang.toUpperCase()}`, 'bot');
-    }
-
-    function appendMessage(text, sender) {
-      const msg = document.createElement("div");
-      msg.className = `message ${sender}`;
-      msg.textContent = text;
-      messages.appendChild(msg);
-      messages.scrollTop = messages.scrollHeight;
-    }
-
-    function sendMessage() {
-      const text = input.value.trim();
-      if (!text) return;
-      appendMessage(text, 'user');
-      input.value = '';
-      respondToUser(text);
-    }
-
-    function respondToUser(msg) {
-      let response = "🤖 Sorry, I didn't catch that.";
-      const m = msg.toLowerCase();
-      if (m.includes("recover") || m.includes("account")) response = "🔧 Let's start your account recovery. Upload your ID or fill out the form below.";
-      else if (m.includes("how long")) response = "⏱️ Most recovery requests are handled within 24–48 hours.";
-      else if (m.includes("hi") || m.includes("hello")) response = "👋 Hello! I’m your recovery assistant."
-      else if (m.includes("thank")) response = "🙏 You're welcome! We’re here to help.";
-      appendMessage(response, 'bot');
-      speak(response);
-    }
-
-    function startListening() {
-      if (!('webkitSpeechRecognition' in window)) {
-        alert("❌ Voice input not supported.");
-        return;
-      }
-      const recognition = new webkitSpeechRecognition();
-      recognition.lang = currentLang === 'vi' ? 'vi-VN' : (currentLang === 'tl' ? 'fil-PH' : 'en-US');
-      recognition.onstart = () => appendMessage("🎤 Listening...", 'bot');
-      recognition.onresult = (e) => {
-        const transcript = e.results[0][0].transcript;
-        input.value = transcript;
-        sendMessage();
-      };
-      recognition.start();
-    }
-
-    function speak(text) {
-      if (!('speechSynthesis' in window)) return;
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = currentLang === 'vi' ? 'vi-VN' : (currentLang === 'tl' ? 'fil-PH' : 'en-US');
-      window.speechSynthesis.speak(utterance);
-    }
-
-    fileInput.addEventListener("change", () => {
-      const file = fileInput.files[0];
-      if (!file) return;
-      appendMessage(`📎 File selected: ${file.name}`, 'user');
-      appendMessage("📬 Sending file securely to CHDS team...", 'bot');
-      setTimeout(() => {
-        appendMessage("✅ Your ID has been submitted. We’ll contact you soon.", 'bot');
-        speak("Your ID has been submitted. We’ll contact you soon.");
-      }, 2000);
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      emailjs.sendForm('service_8ilfzgc', 'template_rh9ugh5', this)
+        .then(() => alert("✅ Your message has been sent! We'll be in touch soon."))
+        .catch(() => alert("❌ There was an error. Please try again later."));
+      form.reset();
+      aiReply.style.display = 'none';
     });
 
-    supportForm.addEventListener("submit", function(e) {
-      e.preventDefault();
-      const name = document.getElementById("name").value;
-      const email = document.getElementById("email").value;
-      const issue = document.getElementById("issue").value;
+    function toggleChatbot() {
+      document.querySelector('.chatbot-container').scrollIntoView({ behavior: 'smooth' });
+    }
 
-      appendMessage(`📤 Form submitted by ${name} (${email})`, 'user');
-      appendMessage("✅ We’ve received your issue and will email you shortly.", 'bot');
-      speak("We’ve received your issue and will email you shortly.");
+    function showServices() {
+      aiReply.innerText = "💼 We specialize in:\n• Facebook Account Recovery\n• Facebook Page Recovery\n• Facebook Account Deletion\n• Assistance with ID uploads\n• Voice-integrated smart chatbot systems";
+      aiReply.style.display = 'block';
+    }
 
-      // Optional: simulate sending email
-      console.log(`Send to: reclaimxc@gmail.com\nName: ${name}\nEmail: ${email}\nIssue: ${issue}`);
-      supportForm.reset();
+    function showFeatures() {
+      aiReply.innerText = "💡 Features you’ll love:\n• Smart Voice Assistant 🎙️\n• Dark Mode & Mobile Responsive ⚡\n• Real-Time Email Submission 📩\n• Multilingual Support 🌍\n• Analytics Integration 📊";
+      aiReply.style.display = 'block';
+    }
+
+    function handleRecovery() {
+      aiReply.innerText = "🔁 Let's help you recover your account. Is this a personal Facebook, page, or business account?";
+      aiReply.style.display = 'block';
+    }
+
+    function handleSupport() {
+      aiReply.innerText = "🎧 Our support team is ready. Would you like to upload your ID or describe your problem first?";
+      aiReply.style.display = 'block';
+    }
+
+    messageBox.addEventListener('input', () => {
+      const value = messageBox.value.toLowerCase();
+      if (value.includes('delete')) {
+        aiReply.innerText = "🗑️ Do you want to delete a Facebook personal account or a page?";
+      } else if (value.includes('recover') || value.includes('recovery')) {
+        aiReply.innerText = "🔁 We're here to help with recovery. Is it your account or page?";
+      } else if (value.includes('upload')) {
+        aiReply.innerText = "📤 You can securely upload your ID using our form. Make sure it's clear and valid.";
+      } else {
+        aiReply.style.display = 'none';
+        return;
+      }
+      aiReply.style.display = 'block';
     });
   </script>
 </body>
-      </html>
-      
+</html>
