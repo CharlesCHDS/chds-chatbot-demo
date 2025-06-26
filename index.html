@@ -3,184 +3,183 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CH Digital Services Chatbot</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" />
+  <title>CH Digital Services</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --primary-color: #0ff;
-      --bg-color: #0c0c0c;
-      --accent-color: #00f5a0;
-      --card-bg: rgba(255, 255, 255, 0.05);
-      --glow: 0 0 8px var(--primary-color), 0 0 16px var(--accent-color);
-    }
-    * {
-      box-sizing: border-box;
-      font-family: 'Poppins', sans-serif;
-      margin: 0;
-      padding: 0;
-    }
     body {
-      background: var(--bg-color);
-      color: white;
-      padding: 20px;
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(145deg, #0f0f0f, #1a1a1a);
+      color: #fff;
+      overflow-x: hidden;
     }
-    .intro-loader {
-      position: fixed;
-      width: 100%;
-      height: 100%;
-      background: #000;
+
+    /* Intro Loading */
+    #intro {
       display: flex;
-      align-items: center;
       justify-content: center;
-      z-index: 9999;
-      animation: fadeOut 2s 2s forwards;
-    }
-    .loader-text {
+      align-items: center;
+      height: 100vh;
+      background: #000;
       font-size: 1.5rem;
-      color: var(--primary-color);
-      animation: pulse 1s infinite;
+      font-weight: 600;
+      animation: fadeOut 2s ease 2s forwards;
     }
-    @keyframes pulse {
-      0%, 100% { opacity: 0.3; }
-      50% { opacity: 1; }
-    }
+
     @keyframes fadeOut {
       to { opacity: 0; visibility: hidden; }
     }
-    .chatbot-container {
-      margin-top: 80px;
-      padding: 20px;
-      background: var(--card-bg);
-      border-radius: 20px;
-      box-shadow: var(--glow);
+
+    .container {
+      padding: 2rem;
+      max-width: 600px;
+      margin: auto;
+      background: rgba(30, 30, 30, 0.85);
+      border-radius: 1rem;
+      box-shadow: 0 0 20px #0ff;
     }
-    .chat-title {
-      font-size: 1.3rem;
-      margin-bottom: 10px;
+
+    h1 {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
     }
-    .options button {
-      background: transparent;
-      border: 1px solid var(--primary-color);
-      color: white;
-      padding: 10px;
-      margin: 5px;
-      border-radius: 10px;
+
+    .button-group button {
+      background-color: #0f0f0f;
+      border: 1px solid #0ff;
+      padding: 0.5rem 1rem;
+      margin: 0.5rem 0.25rem;
+      color: #0ff;
+      border-radius: 0.5rem;
       cursor: pointer;
-      transition: all 0.3s;
+      transition: 0.3s;
     }
-    .options button:hover {
-      background: var(--primary-color);
-      color: black;
+
+    .button-group button:hover {
+      background-color: #0ff;
+      color: #000;
     }
+
+    .response {
+      margin-top: 1rem;
+      background: #222;
+      padding: 1rem;
+      border-radius: 0.5rem;
+    }
+
+    .floating-btn {
+      position: fixed;
+      bottom: 1rem;
+      right: 1rem;
+      background: #0ff;
+      color: #000;
+      border: none;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      font-size: 1.5rem;
+      cursor: pointer;
+      box-shadow: 0 0 10px #0ff;
+      z-index: 1000;
+    }
+
     input, textarea {
       width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-      border-radius: 10px;
+      margin: 0.5rem 0;
+      padding: 0.75rem;
+      border-radius: 0.5rem;
       border: none;
+      background: #333;
+      color: #fff;
     }
-    .submit-btn {
-      background: var(--accent-color);
-      color: black;
-      border: none;
-      padding: 12px;
-      border-radius: 10px;
-      margin-top: 15px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background 0.3s;
+
+    .mic-hint {
+      font-size: 0.85rem;
+      color: #aaa;
+      margin-top: -0.5rem;
     }
-    .submit-btn:hover {
-      background: var(--primary-color);
-    }
-    .voice-hint {
-      font-size: 0.9rem;
-      opacity: 0.7;
-      margin-top: 5px;
-    }
-    .floating-chat-btn {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: var(--primary-color);
-      padding: 12px;
-      border-radius: 50%;
-      box-shadow: var(--glow);
+
+    #voiceBtn {
+      margin-top: 0.5rem;
+      background: #0ff;
+      color: #000;
+      border-radius: 0.5rem;
+      padding: 0.5rem 1rem;
       border: none;
       cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <div class="intro-loader">
-    <div class="loader-text">Launching CH Digital Services...</div>
-  </div>
-
-  <div class="chatbot-container">
-    <div class="chat-title">👋 Hi! Welcome to <strong>CH Digital Services</strong>.<br>How can I assist you today?</div>
-    <div class="options">
-      <button onclick="selectService('Facebook Recovery')">Facebook Recovery</button>
-      <button onclick="selectService('Account Deletion')">Account Deletion</button>
-      <button onclick="selectService('Page Recovery')">Page Recovery</button>
+  <div id="intro">🚀 Loading CH Digital Services...</div>
+  <div class="container" style="display:none;" id="mainContent">
+    <h1>👋 Hi! Welcome to CH Digital Services.<br>How can I assist you today?</h1>
+    <div class="button-group">
+      <button onclick="setIssue('Facebook Recovery')">Facebook Recovery</button>
+      <button onclick="setIssue('Account Deletion')">Account Deletion</button>
+      <button onclick="setIssue('Page Recovery')">Page Recovery</button>
     </div>
 
     <label for="issue">Type your issue:</label>
-    <input type="text" id="issue" placeholder="Describe your Facebook problem..." oninput="analyzeIssue(this.value)">
-    <div class="voice-hint">🎤 Voice ready (EN/VI/PH)</div>
-    <div id="smartReply"></div>
+    <input type="text" id="issue" placeholder="Describe your problem">
+    <div class="mic-hint">🎤 Voice ready (EN/VI/PH)</div>
+    <button id="voiceBtn">🎙️ Speak</button>
 
-    <form id="contactForm">
-      <input type="text" name="name" placeholder="Full Name" required>
-      <input type="email" name="email" placeholder="Your Email" required>
-      <textarea name="message" rows="4" placeholder="Describe your issue"></textarea>
-      <input type="file" name="upload">
-      <button type="submit" class="submit-btn">Submit Recovery Request</button>
+    <div class="response" id="responseBox"></div>
+
+    <form id="recoveryForm">
+      <input type="text" placeholder="Full Name" name="fullName" required>
+      <input type="email" placeholder="Your Email" name="email" required>
+      <textarea placeholder="Describe your issue" name="details"></textarea>
+      <input type="file" name="file">
+      <button type="submit">Submit Recovery Request</button>
     </form>
   </div>
 
-  <button class="floating-chat-btn" onclick="toggleChat()">💬</button>
+  <button class="floating-btn" onclick="toggleHelp()">💬</button>
 
   <script>
-    // Fade loading screen
-    window.addEventListener('load', () => {
-      setTimeout(() => document.querySelector('.intro-loader').style.display = 'none', 2500);
-    });
+    window.onload = () => {
+      setTimeout(() => {
+        document.getElementById('intro').style.display = 'none';
+        document.getElementById('mainContent').style.display = 'block';
+      }, 2200);
+    };
 
-    function selectService(service) {
-      document.getElementById('issue').value = `I need help with ${service.toLowerCase()}`;
-      analyzeIssue(document.getElementById('issue').value);
+    function setIssue(text) {
+      document.getElementById('issue').value = text;
+      document.getElementById('responseBox').innerText = `${text} detected. Please submit the form.`;
     }
 
-    function analyzeIssue(text) {
-      const replyBox = document.getElementById('smartReply');
-      if (text.toLowerCase().includes('delete')) {
-        replyBox.innerHTML = '🗑️ Deletion request detected. Submit your reason in the form.';
-      } else if (text.toLowerCase().includes('recover')) {
-        replyBox.innerHTML = '✅ Recovery request detected. Please fill in the details below.';
-      } else {
-        replyBox.innerHTML = '';
-      }
+    function toggleHelp() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      alert('Need help? Choose a service or type your issue below.');
     }
 
-    document.getElementById('contactForm').addEventListener('submit', function (e) {
-      e.preventDefault();
-      const formData = new FormData(this);
-      fetch('https://api.emailjs.com/api/v1.0/email/send-form', {
-        method: 'POST',
-        body: formData,
-        headers: {
-          'origin': 'https://chds.github.io'
-        }
-      }).then(res => {
-        alert('✅ Submitted! You’ll receive confirmation soon.');
-        this.reset();
-      }).catch(err => {
-        alert('❌ Failed to submit. Try again.');
-      });
-    });
+    // Voice input logic
+    const voiceBtn = document.getElementById('voiceBtn');
+    const issueInput = document.getElementById('issue');
+    const recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (recognition) {
+      const recog = new recognition();
+      recog.lang = 'en-US';
+      recog.continuous = false;
 
-    function toggleChat() {
-      document.querySelector('.chatbot-container').scrollIntoView({ behavior: 'smooth' });
+      voiceBtn.onclick = () => {
+        recog.start();
+        voiceBtn.innerText = '🎙️ Listening...';
+      };
+
+      recog.onresult = (event) => {
+        issueInput.value = event.results[0][0].transcript;
+        voiceBtn.innerText = '🎙️ Speak';
+        setIssue(issueInput.value);
+      };
+
+      recog.onerror = () => {
+        voiceBtn.innerText = '🎙️ Speak';
+        alert('Voice recognition failed. Try again.');
+      };
     }
   </script>
 </body>
