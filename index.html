@@ -78,13 +78,49 @@
       background: #0e0e0e;
       height: 100vh;
       color: #00ffff;
-      font-size: 1.5rem;
+      font-family: 'Poppins', sans-serif;
     }
-    .hidden { display: none; }
+    .loader-content {
+      text-align: center;
+      animation: fadeIn 1.5s ease-in-out;
+    }
+    .loader-content h1 {
+      font-size: 2rem;
+      margin-bottom: 10px;
+      color: #00ffff;
+      text-shadow: 0 0 10px #00ffff;
+    }
+    .loader-content p {
+      font-size: 1rem;
+      margin-bottom: 20px;
+      color: #a0fdfd;
+    }
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #00ffff;
+      border-top: 4px solid transparent;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
   </style>
 </head>
 <body>
-  <div id="loading">🔄 Loading CH Digital Services...</div>
+  <div id="loading">
+    <div class="loader-content">
+      <h1>CH Digital Services</h1>
+      <p>Launching your AI assistant...</p>
+      <div class="spinner"></div>
+    </div>
+  </div>
+
   <div id="main" class="hidden">
     <div class="container">
       <div class="avatar"></div>
@@ -123,7 +159,7 @@
       setTimeout(() => {
         document.getElementById('loading').classList.add('hidden');
         document.getElementById('main').classList.remove('hidden');
-      }, 1500);
+      }, 1800);
     }
 
     function setIssue(text) {
@@ -139,10 +175,8 @@
 
     document.getElementById('issueForm').addEventListener('submit', async function(e) {
       e.preventDefault();
-
       const formData = new FormData(this);
 
-      // EmailJS Integration
       fetch("https://api.emailjs.com/api/v1.0/email/send-form", {
         method: "POST",
         headers: {
