@@ -5,7 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CH Digital Services Chatbot</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet" />
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-DR5B47C0EF"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-DR5B47C0EF');
+  </script>
   <style>
     body { font-family: 'Roboto', sans-serif; background: #000; color: #fff; margin: 0; padding: 0; overflow-x: hidden; }
     canvas#bg { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; }
@@ -28,6 +34,9 @@
     .float-btn { bottom: 20px; right: 20px; }
     .lang-select { top: 20px; right: 20px; }
     .lang-select select { background: #121212; color: white; border: none; padding: 5px; border-radius: 6px; }
+    .upload-section { padding: 10px; text-align: center; background: #1c1c1c; }
+    .upload-section input[type='file'] { display: block; margin: 10px auto; color: white; }
+    .upload-status { margin-top: 10px; color: lightgreen; font-size: 0.9em; }
     @keyframes fadeIn { from {opacity: 0;} to {opacity: 1;} }
   </style>
 </head>
@@ -55,10 +64,15 @@
   </div>
   <div class="input-box">
     <input type="text" id="userInput" placeholder="Type your message..."/>
-    <button onclick="sendMessage()">Send</button>
+    <button onclick="sendMessage();gtag('event', 'message_sent');">Send</button>
   </div>
 </div>
-<div class="float-btn" onclick="openFAQ()">❓ Help / FAQ</div>
+<div class="upload-section">
+  <label for="upload">📤 Upload your ID:</label>
+  <input type="file" id="upload" accept="image/*,application/pdf" onchange="uploadFile()" />
+  <div class="upload-status" id="uploadStatus"></div>
+</div>
+<div class="float-btn" onclick="openFAQ();gtag('event', 'help_clicked');">❓ Help / FAQ</div>
 <script>
   const memory = { name: '', contact: '', language: 'en' };
   const LANG = {
@@ -70,10 +84,9 @@
     memory.language = code;
     document.getElementById("welcomeMsg").innerText = LANG[code].welcome;
   }
-  function openFAQ() {
-    alert(LANG[memory.language].faq);
-  }
+  function openFAQ() { alert(LANG[memory.language].faq); }
   window.onload = () => {
+    gtag('event', 'chat_opened');
     setTimeout(() => {
       document.getElementById('loader').style.display = 'none';
       document.querySelector('.chatbox').style.display = 'flex';
@@ -99,17 +112,14 @@
   function respondToUser(msg) {
     const lower = msg.toLowerCase();
     let response = "🤖 I'm not sure I understand yet. Please type 1-4 or ask a question like 'How long does recovery take?'";
-    if (lower.includes("my name is")) {
-      memory.name = lower.split("my name is")[1].trim().split(" ")[0];
-      response = `👍 Got it, ${memory.name}. How can I assist you today?`;
-    } else if (lower.includes("@") || lower.match(/\d{10,}/)) {
+    if (lower.includes("@") || lower.match(/\d{10,}/)) {
       memory.contact = msg;
       response = `📧 Thanks! I’ve saved your contact: ${memory.contact}`;
     } else if (lower.includes("lost") || lower.includes("disabled") || lower.includes("need help")) {
       response = `😟 I'm here for you! Would you like to:
-1️⃣ Start a recovery: <a href='https://chdsform.github.io/chds-appeal-form' target='_blank'>Start Now</a><br>2️⃣ Upload ID: <a href='https://chdsform.github.io/upload-id' target='_blank'>Upload Here</a>`;
+1️⃣ Start a recovery: <a href='https://chdsform.github.io/chds-appeal-form' target='_blank'>Start Now</a><br>2️⃣ Upload ID below 👇`;
     } else if (lower.includes("upload")) {
-      response = `📤 You can upload your government ID here: <a href='https://chdsform.github.io/upload-id' target='_blank'>Upload Now</a>`;
+      response = `📤 Please scroll down to upload your government ID directly below.`;
     } else if (lower.includes("how") && lower.includes("long")) {
       response = `⏳ Most recoveries take 24–48 hours. We'll notify you once it's processed.`;
     } else if (lower.includes("what") && lower.includes("needed")) {
@@ -117,15 +127,15 @@
     } else if (lower === "1") {
       response = `🔧 Start your recovery: <a href='https://chdsform.github.io/chds-appeal-form' target='_blank'>CHDS Appeal Form</a>`;
     } else if (lower === "2") {
-      response = `📤 Upload ID here: <a href='https://chdsform.github.io/upload-id' target='_blank'>Upload Now</a>`;
+      response = `📤 Upload your ID below 👇`;
     } else if (lower === "3") {
       response = `📊 Track your request here: <a href='https://chdsform.github.io/status-check' target='_blank'>Track Now</a>`;
     } else if (lower === "4") {
       response = `📨 Contact support: <a href='https://m.me/CharlesCHDS' target='_blank'>Message Now</a>`;
     } else if (lower.includes("hi") || lower.includes("hello")) {
-      response = `👋 Hi ${memory.name || 'there'}! I'm CHDS Bot. I can help you with:<br>1️⃣ Account Recovery<br>2️⃣ Upload ID<br>3️⃣ Track Request<br>4️⃣ Contact Support`; 
+      response = `👋 Hi! I'm CHDS Bot. I can help you with:<br>1️⃣ Account Recovery<br>2️⃣ Upload ID<br>3️⃣ Track Request<br>4️⃣ Contact Support`; 
     }
-    appendMessage(marked.parse(response), 'bot');
+    appendMessage(response, 'bot');
   }
   function appendMessage(content, sender) {
     const msg = document.createElement('div');
@@ -134,22 +144,16 @@
     messages.appendChild(msg);
     messages.scrollTop = messages.scrollHeight;
   }
-  const canvas = document.getElementById("bg");
-  const ctx = canvas.getContext("2d");
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  const stars = Array.from({length: 150}, () => ({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, r: Math.random()*1.5 + 0.5 }));
-  function drawStars() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = "#1f51ff";
-    stars.forEach(s => {
-      ctx.beginPath();
-      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-      ctx.fill();
-    });
-    requestAnimationFrame(drawStars);
+  function uploadFile() {
+    const file = document.getElementById('upload').files[0];
+    if (!file) return;
+    document.getElementById('uploadStatus').innerText = "Uploading...";
+    gtag('event', 'upload_started');
+    setTimeout(() => {
+      document.getElementById('uploadStatus').innerText = `✅ ${file.name} uploaded successfully!`;
+      gtag('event', 'upload_success');
+    }, 2000); // simulate upload
   }
-  drawStars();
 </script>
 </body>
 </html>
