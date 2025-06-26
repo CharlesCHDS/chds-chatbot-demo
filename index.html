@@ -3,15 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CH Digital Services</title>
+  <title>CH Digital Services - Recovery Assistant</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+  <script src="https://unpkg.com/vanilla-tilt"></script>
   <script>
     (function(){
       emailjs.init("TuOKpz6JGnAygQ6Fp");
     })();
   </script>
   <style>
+    * { box-sizing: border-box; }
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
@@ -19,21 +21,27 @@
       color: white;
     }
     header {
-      background: linear-gradient(45deg, #000428, #004e92);
+      background: linear-gradient(90deg, #0f2027, #203a43, #2c5364);
       padding: 1em;
       text-align: center;
-      font-size: 1.5em;
+      font-size: 1.8em;
       font-weight: bold;
+      color: #10b981;
+    }
+    header img {
+      width: 45px;
+      border-radius: 50%;
+      vertical-align: middle;
+      margin-right: 10px;
     }
     .chatbot-container {
       padding: 20px;
-      max-width: 600px;
-      margin: 0 auto;
+      max-width: 650px;
+      margin: 20px auto;
       background: #111827;
       border-radius: 20px;
-      box-shadow: 0 0 30px rgba(0, 255, 255, 0.1);
+      box-shadow: 0 0 25px rgba(0, 255, 255, 0.15);
       animation: fadeIn 1s ease-in;
-      scroll-margin-top: 100px;
     }
     .chatbot-message, .chatbot-input {
       margin: 15px 0;
@@ -74,21 +82,17 @@
       margin-top: 5px;
       color: #9ca3af;
     }
-    .suggested-buttons {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
+    .suggested-buttons, .ai-response {
       margin: 15px 0;
     }
     .suggested-buttons button {
-      flex: 1 1 45%;
       background: #1f2937;
       border: 1px solid #4b5563;
       color: #f3f4f6;
       padding: 10px;
       border-radius: 10px;
+      margin-right: 10px;
       cursor: pointer;
-      transition: 0.3s;
     }
     .suggested-buttons button:hover {
       background: #374151;
@@ -96,13 +100,11 @@
     .ai-response {
       background: #1f2937;
       padding: 10px;
-      margin-top: 15px;
       border-radius: 10px;
       color: #d1d5db;
     }
     #preview-container img {
       max-width: 100%;
-      margin-top: 10px;
       border-radius: 10px;
     }
     @keyframes fadeIn {
@@ -118,11 +120,37 @@
 </head>
 <body>
   <header>
-    <img src="https://i.ibb.co/k2xHwFFz/Chat-GPT-Image-Jun-23-2025-01-33-11-PM.png" alt="CHDS Logo" style="width: 40px; border-radius: 50%; vertical-align: middle; margin-right: 10px;"> CH Digital Services
+    <img src="https://i.ibb.co/k2xHwFFz/Chat-GPT-Image-Jun-23-2025-01-33-11-PM.png" alt="Logo"> CH Digital Services
   </header>
 
   <div class="chatbot-container" id="chatbot-section">
-    <!-- Chatbot content remains unchanged -->
+    <div class="chatbot-message">
+      👋 Hi! Welcome to CH Digital Services.<br>
+      How can I assist you today?
+    </div>
+
+    <div class="suggested-buttons">
+      <button onclick="autoFill('recover')">Facebook Recovery</button>
+      <button onclick="autoFill('delete')">Account Deletion</button>
+      <button onclick="autoFill('page')">Page Recovery</button>
+    </div>
+
+    <div class="chatbot-input">
+      <label for="userMessage">Type your issue:</label>
+      <input type="text" id="userMessage" placeholder="e.g. My Facebook got disabled..." style="width: 100%; padding: 10px; border-radius: 10px; border: none; margin-top: 10px;">
+      <div class="voice-status" id="voiceStatus">🎤 Voice ready (EN/VI/PH)</div>
+    </div>
+
+    <div class="ai-response" id="aiReply">Let’s get started with your account recovery.</div>
+
+    <form id="contact-form">
+      <input type="text" name="from_name" placeholder="Full Name" required><br><br>
+      <input type="email" name="user_email" placeholder="Your Email" required><br><br>
+      <textarea name="message" placeholder="Describe your issue" rows="4" required></textarea><br><br>
+      <input type="file" id="fileUpload" accept="image/*"><br>
+      <div id="preview-container"></div>
+      <button type="submit" class="chatbot-button">Submit Recovery Request</button>
+    </form>
   </div>
 
   <button class="floating-button" onclick="scrollToChatbot()"><i class="fas fa-comments"></i></button>
@@ -131,6 +159,48 @@
     function scrollToChatbot() {
       document.getElementById('chatbot-section').scrollIntoView({ behavior: 'smooth' });
     }
+
+    function autoFill(type) {
+      const messageField = document.getElementById('userMessage');
+      const reply = document.getElementById('aiReply');
+      switch(type) {
+        case 'recover':
+          messageField.value = "My Facebook account was disabled. Please help me recover it.";
+          reply.innerText = "✅ Recovery request detected. Please fill the form below.";
+          break;
+        case 'delete':
+          messageField.value = "I want to permanently delete my Facebook account.";
+          reply.innerText = "🗑️ Deletion request detected. Submit your reason in the form.";
+          break;
+        case 'page':
+          messageField.value = "My Facebook page was hacked and removed. Help!";
+          reply.innerText = "📄 Page recovery requested. Fill out the details below.";
+          break;
+      }
+    }
+
+    document.getElementById("fileUpload").addEventListener("change", function (e) {
+      const reader = new FileReader();
+      reader.onload = function () {
+        const img = document.createElement("img");
+        img.src = reader.result;
+        document.getElementById("preview-container").innerHTML = "";
+        document.getElementById("preview-container").appendChild(img);
+      };
+      reader.readAsDataURL(e.target.files[0]);
+    });
+
+    document.getElementById("contact-form").addEventListener("submit", function (event) {
+      event.preventDefault();
+      emailjs.sendForm("service_8ilfzgc", "template_rh9ugh5", this)
+        .then(() => {
+          alert("✅ Your request was submitted successfully!");
+          this.reset();
+          document.getElementById("preview-container").innerHTML = "";
+        }, () => {
+          alert("❌ There was an error sending your request.");
+        });
+    });
   </script>
 </body>
 </html>
