@@ -3,204 +3,185 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CH Digital Services - Recovery Assistant</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-  <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
-  <script src="https://unpkg.com/vanilla-tilt"></script>
-  <script>
-    (function(){
-      emailjs.init("TuOKpz6JGnAygQ6Fp");
-    })();
-  </script>
+  <title>CH Digital Services Chatbot</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" />
   <style>
-    * { box-sizing: border-box; }
-    body {
+    :root {
+      --primary-color: #0ff;
+      --bg-color: #0c0c0c;
+      --accent-color: #00f5a0;
+      --card-bg: rgba(255, 255, 255, 0.05);
+      --glow: 0 0 8px var(--primary-color), 0 0 16px var(--accent-color);
+    }
+    * {
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
       margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: #0a0f1a;
+      padding: 0;
+    }
+    body {
+      background: var(--bg-color);
       color: white;
+      padding: 20px;
     }
-    header {
-      background: linear-gradient(90deg, #0f2027, #203a43, #2c5364);
-      padding: 1em;
-      text-align: center;
-      font-size: 1.8em;
-      font-weight: bold;
-      color: #10b981;
+    .intro-loader {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      animation: fadeOut 2s 2s forwards;
     }
-    header img {
-      width: 45px;
-      border-radius: 50%;
-      vertical-align: middle;
-      margin-right: 10px;
+    .loader-text {
+      font-size: 1.5rem;
+      color: var(--primary-color);
+      animation: pulse 1s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 1; }
+    }
+    @keyframes fadeOut {
+      to { opacity: 0; visibility: hidden; }
     }
     .chatbot-container {
+      margin-top: 80px;
       padding: 20px;
-      max-width: 650px;
-      margin: 20px auto;
-      background: #111827;
+      background: var(--card-bg);
       border-radius: 20px;
-      box-shadow: 0 0 25px rgba(0, 255, 255, 0.15);
-      animation: fadeIn 1s ease-in;
+      box-shadow: var(--glow);
     }
-    .chatbot-message, .chatbot-input {
-      margin: 15px 0;
+    .chat-title {
+      font-size: 1.3rem;
+      margin-bottom: 10px;
     }
-    .chatbot-button {
-      display: block;
-      background: #10b981;
+    .options button {
+      background: transparent;
+      border: 1px solid var(--primary-color);
       color: white;
-      border: none;
-      padding: 12px 20px;
+      padding: 10px;
+      margin: 5px;
       border-radius: 10px;
-      margin: 10px 0;
       cursor: pointer;
+      transition: all 0.3s;
+    }
+    .options button:hover {
+      background: var(--primary-color);
+      color: black;
+    }
+    input, textarea {
       width: 100%;
-      transition: 0.3s;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 10px;
+      border: none;
     }
-    .chatbot-button:hover {
-      background: #059669;
+    .submit-btn {
+      background: var(--accent-color);
+      color: black;
+      border: none;
+      padding: 12px;
+      border-radius: 10px;
+      margin-top: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
     }
-    .floating-button {
+    .submit-btn:hover {
+      background: var(--primary-color);
+    }
+    .voice-hint {
+      font-size: 0.9rem;
+      opacity: 0.7;
+      margin-top: 5px;
+    }
+    .floating-chat-btn {
       position: fixed;
       bottom: 20px;
       right: 20px;
-      background: #3b82f6;
-      border: none;
+      background: var(--primary-color);
+      padding: 12px;
       border-radius: 50%;
-      width: 60px;
-      height: 60px;
-      font-size: 1.5em;
-      color: white;
-      box-shadow: 0 0 20px rgba(0, 123, 255, 0.5);
+      box-shadow: var(--glow);
+      border: none;
       cursor: pointer;
-      animation: pulse 2s infinite;
-      z-index: 9999;
-    }
-    .voice-status {
-      font-size: 0.8em;
-      margin-top: 5px;
-      color: #9ca3af;
-    }
-    .suggested-buttons, .ai-response {
-      margin: 15px 0;
-    }
-    .suggested-buttons button {
-      background: #1f2937;
-      border: 1px solid #4b5563;
-      color: #f3f4f6;
-      padding: 10px;
-      border-radius: 10px;
-      margin-right: 10px;
-      cursor: pointer;
-    }
-    .suggested-buttons button:hover {
-      background: #374151;
-    }
-    .ai-response {
-      background: #1f2937;
-      padding: 10px;
-      border-radius: 10px;
-      color: #d1d5db;
-    }
-    #preview-container img {
-      max-width: 100%;
-      border-radius: 10px;
-    }
-    @keyframes fadeIn {
-      from {opacity: 0; transform: translateY(20px);}
-      to {opacity: 1; transform: translateY(0);}
-    }
-    @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); }
-      70% { box-shadow: 0 0 0 20px rgba(59, 130, 246, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
     }
   </style>
 </head>
 <body>
-  <header>
-    <img src="https://i.ibb.co/k2xHwFFz/Chat-GPT-Image-Jun-23-2025-01-33-11-PM.png" alt="Logo"> CH Digital Services
-  </header>
+  <div class="intro-loader">
+    <div class="loader-text">Launching CH Digital Services...</div>
+  </div>
 
-  <div class="chatbot-container" id="chatbot-section">
-    <div class="chatbot-message">
-      👋 Hi! Welcome to CH Digital Services.<br>
-      How can I assist you today?
+  <div class="chatbot-container">
+    <div class="chat-title">👋 Hi! Welcome to <strong>CH Digital Services</strong>.<br>How can I assist you today?</div>
+    <div class="options">
+      <button onclick="selectService('Facebook Recovery')">Facebook Recovery</button>
+      <button onclick="selectService('Account Deletion')">Account Deletion</button>
+      <button onclick="selectService('Page Recovery')">Page Recovery</button>
     </div>
 
-    <div class="suggested-buttons">
-      <button onclick="autoFill('recover')">Facebook Recovery</button>
-      <button onclick="autoFill('delete')">Account Deletion</button>
-      <button onclick="autoFill('page')">Page Recovery</button>
-    </div>
+    <label for="issue">Type your issue:</label>
+    <input type="text" id="issue" placeholder="Describe your Facebook problem..." oninput="analyzeIssue(this.value)">
+    <div class="voice-hint">🎤 Voice ready (EN/VI/PH)</div>
+    <div id="smartReply"></div>
 
-    <div class="chatbot-input">
-      <label for="userMessage">Type your issue:</label>
-      <input type="text" id="userMessage" placeholder="e.g. My Facebook got disabled..." style="width: 100%; padding: 10px; border-radius: 10px; border: none; margin-top: 10px;">
-      <div class="voice-status" id="voiceStatus">🎤 Voice ready (EN/VI/PH)</div>
-    </div>
-
-    <div class="ai-response" id="aiReply">Let’s get started with your account recovery.</div>
-
-    <form id="contact-form">
-      <input type="text" name="from_name" placeholder="Full Name" required><br><br>
-      <input type="email" name="user_email" placeholder="Your Email" required><br><br>
-      <textarea name="message" placeholder="Describe your issue" rows="4" required></textarea><br><br>
-      <input type="file" id="fileUpload" accept="image/*"><br>
-      <div id="preview-container"></div>
-      <button type="submit" class="chatbot-button">Submit Recovery Request</button>
+    <form id="contactForm">
+      <input type="text" name="name" placeholder="Full Name" required>
+      <input type="email" name="email" placeholder="Your Email" required>
+      <textarea name="message" rows="4" placeholder="Describe your issue"></textarea>
+      <input type="file" name="upload">
+      <button type="submit" class="submit-btn">Submit Recovery Request</button>
     </form>
   </div>
 
-  <button class="floating-button" onclick="scrollToChatbot()"><i class="fas fa-comments"></i></button>
+  <button class="floating-chat-btn" onclick="toggleChat()">💬</button>
 
   <script>
-    function scrollToChatbot() {
-      document.getElementById('chatbot-section').scrollIntoView({ behavior: 'smooth' });
+    // Fade loading screen
+    window.addEventListener('load', () => {
+      setTimeout(() => document.querySelector('.intro-loader').style.display = 'none', 2500);
+    });
+
+    function selectService(service) {
+      document.getElementById('issue').value = `I need help with ${service.toLowerCase()}`;
+      analyzeIssue(document.getElementById('issue').value);
     }
 
-    function autoFill(type) {
-      const messageField = document.getElementById('userMessage');
-      const reply = document.getElementById('aiReply');
-      switch(type) {
-        case 'recover':
-          messageField.value = "My Facebook account was disabled. Please help me recover it.";
-          reply.innerText = "✅ Recovery request detected. Please fill the form below.";
-          break;
-        case 'delete':
-          messageField.value = "I want to permanently delete my Facebook account.";
-          reply.innerText = "🗑️ Deletion request detected. Submit your reason in the form.";
-          break;
-        case 'page':
-          messageField.value = "My Facebook page was hacked and removed. Help!";
-          reply.innerText = "📄 Page recovery requested. Fill out the details below.";
-          break;
+    function analyzeIssue(text) {
+      const replyBox = document.getElementById('smartReply');
+      if (text.toLowerCase().includes('delete')) {
+        replyBox.innerHTML = '🗑️ Deletion request detected. Submit your reason in the form.';
+      } else if (text.toLowerCase().includes('recover')) {
+        replyBox.innerHTML = '✅ Recovery request detected. Please fill in the details below.';
+      } else {
+        replyBox.innerHTML = '';
       }
     }
 
-    document.getElementById("fileUpload").addEventListener("change", function (e) {
-      const reader = new FileReader();
-      reader.onload = function () {
-        const img = document.createElement("img");
-        img.src = reader.result;
-        document.getElementById("preview-container").innerHTML = "";
-        document.getElementById("preview-container").appendChild(img);
-      };
-      reader.readAsDataURL(e.target.files[0]);
+    document.getElementById('contactForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const formData = new FormData(this);
+      fetch('https://api.emailjs.com/api/v1.0/email/send-form', {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'origin': 'https://chds.github.io'
+        }
+      }).then(res => {
+        alert('✅ Submitted! You’ll receive confirmation soon.');
+        this.reset();
+      }).catch(err => {
+        alert('❌ Failed to submit. Try again.');
+      });
     });
 
-    document.getElementById("contact-form").addEventListener("submit", function (event) {
-      event.preventDefault();
-      emailjs.sendForm("service_8ilfzgc", "template_rh9ugh5", this)
-        .then(() => {
-          alert("✅ Your request was submitted successfully!");
-          this.reset();
-          document.getElementById("preview-container").innerHTML = "";
-        }, () => {
-          alert("❌ There was an error sending your request.");
-        });
-    });
+    function toggleChat() {
+      document.querySelector('.chatbot-container').scrollIntoView({ behavior: 'smooth' });
+    }
   </script>
 </body>
 </html>
