@@ -64,12 +64,6 @@
       border-radius: 50%;
       background: url('https://ibb.co/NhG2Ck7') center/cover;
       margin: auto;
-      animation: pulse 2s infinite;
-    }
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.1); }
-      100% { transform: scale(1); }
     }
     #loading {
       display: flex;
@@ -78,7 +72,7 @@
       background: #0e0e0e;
       height: 100vh;
       color: #00ffff;
-      font-family: 'Poppins', sans-serif;
+      flex-direction: column;
     }
     .loader-content {
       text-align: center;
@@ -89,12 +83,6 @@
       margin-bottom: 10px;
       color: #00ffff;
       text-shadow: 0 0 10px #00ffff;
-      animation: morph 3s ease-in-out infinite alternate;
-    }
-    .loader-content p {
-      font-size: 1rem;
-      margin-bottom: 20px;
-      color: #a0fdfd;
     }
     .spinner {
       width: 40px;
@@ -103,6 +91,7 @@
       border-top: 4px solid transparent;
       border-radius: 50%;
       animation: spin 1s linear infinite;
+      margin: 20px auto;
     }
     @keyframes spin {
       to { transform: rotate(360deg); }
@@ -111,23 +100,22 @@
       from { opacity: 0; transform: translateY(-20px); }
       to { opacity: 1; transform: translateY(0); }
     }
-    @keyframes morph {
-      0% { letter-spacing: 0px; transform: scale(1); }
-      50% { letter-spacing: 3px; transform: scale(1.05); }
-      100% { letter-spacing: 1px; transform: scale(1); }
+    #main {
+      display: none; /* Hide main content initially */
     }
   </style>
 </head>
 <body>
   <div id="loading">
     <div class="loader-content">
+      <img src="https://your-logo-url.com/logo.png" alt="Logo" style="width: 100px; margin-bottom: 20px;" />
       <h1>CH Digital Services</h1>
       <p>Launching your AI assistant...</p>
       <div class="spinner"></div>
     </div>
   </div>
 
-  <div id="main" class="hidden">
+  <div id="main">
     <div class="container">
       <div class="avatar"></div>
       <h1>👋 Welcome to CH Digital Services</h1>
@@ -163,9 +151,9 @@
   <script>
     window.onload = () => {
       setTimeout(() => {
-        document.getElementById('loading').classList.add('hidden');
-        document.getElementById('main').classList.remove('hidden');
-      }, 1800);
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('main').style.display = 'block';
+      }, 2000); // Adjust the duration as needed
     }
 
     function setIssue(text) {
